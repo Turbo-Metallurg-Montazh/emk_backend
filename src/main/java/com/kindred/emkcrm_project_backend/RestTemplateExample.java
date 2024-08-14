@@ -17,6 +17,7 @@ public class RestTemplateExample {
         System.out.println(tender.getId());
 
 
+
         FoundTendersArray foundTendersArray = FindTenders.findTenders(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "2011-12-30T07:43:31.681Z", "2031-12-30T07:43:31.681Z", 1, 10);
         System.out.println(foundTendersArray.getFoundTenders().getFoundTenders());
 
