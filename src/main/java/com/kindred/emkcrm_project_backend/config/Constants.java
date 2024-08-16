@@ -11,4 +11,5 @@ public class Constants {
 
     //public static final int MAX_PAGE_COUNT = 10;
     public static final int ITEMS_ON_PAGE = 50;
+    public static final String SCHEDULE_TIME = "30 29 11 * * ?";
 }
