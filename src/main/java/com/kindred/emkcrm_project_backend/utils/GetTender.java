@@ -21,7 +21,6 @@ public abstract class GetTender {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-
         System.out.println("Response: " + response.getBody());
 
         return TenderDeserializer.deserialize(response.getBody());
