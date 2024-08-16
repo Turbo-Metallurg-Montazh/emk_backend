@@ -5,9 +5,10 @@ import lombok.Data;
 
 import java.util.ArrayList;
 
+
 @Data
 @AllArgsConstructor
-public class FindTendersPostEntity {
+public class FindTendersPost {
     private ArrayList<String> text;
     private Boolean strictSearch;
     private Boolean attachments;
