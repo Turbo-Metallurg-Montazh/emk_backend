@@ -4,19 +4,40 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "illiquid_assets")
+
 @Data
 @NoArgsConstructor
 public class IlliquidAssets {
+    IlliquidAssets(String commodityMaterialValue, String articleNumber, float quantity, String unitsOfMeasurement, float price, String currency, String arrivalDate, String responsibleEmployee, long createdById, String commentary, String avito, String assetType, String assetStatus) {
+        this.commodityMaterialValue = commodityMaterialValue;
+        this.articleNumber = articleNumber;
+        this.quantity = quantity;
+        this.unitsOfMeasurement = unitsOfMeasurement;
+        this.price = price;
+        this.currency = currency;
+        this.summaryPrice = price * quantity;
+        this.arrivalDate = arrivalDate;
+        this.responsibleEmployee = responsibleEmployee;
+        this.createdById = createdById;
+        this.commentary = commentary;
+        this.avito = avito;
+        this.assetType = assetType;
+        this.assetStatus = assetStatus;
+        this.creatingDate = LocalDateTime.now();
+
+    }
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "commodity_material_value")
+    @Column(name = "commodity_material_value", nullable = false)
     private String commodityMaterialValue;
 
     @Column(name = "article_number")
@@ -37,7 +58,7 @@ public class IlliquidAssets {
     @Column(name = "summary_price")
     private float summaryPrice;
 
-    @Column(name = "arrival_date")
+    @Column(name = "arrival_date", nullable = false)
     private String arrivalDate;
 
     @Column(name = "creating_date", nullable = false)
@@ -49,7 +70,7 @@ public class IlliquidAssets {
     @Column(name = "responsible_employee")
     private String responsibleEmployee;
 
-    @Column(name = "created_by_id")
+    @Column(name = "created_by_id", nullable = false)
     private long createdById;
 
     @Column(name = "commentary")
@@ -61,7 +82,7 @@ public class IlliquidAssets {
     @Column(name = "asset_type")
     private String assetType;
 
-    @Column(name = "asset_status")
+    @Column(name = "asset_status", nullable = false)
     private String assetStatus;
 
 }

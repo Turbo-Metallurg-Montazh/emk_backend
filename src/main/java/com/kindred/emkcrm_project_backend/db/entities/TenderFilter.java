@@ -1,9 +1,10 @@
 package com.kindred.emkcrm_project_backend.db.entities;
 
 
-import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "tender_filter")

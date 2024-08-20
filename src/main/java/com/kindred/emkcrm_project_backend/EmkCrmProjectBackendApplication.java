@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @SpringBootApplication
 @EnableScheduling
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class EmkCrmProjectBackendApplication {
 
     @Autowired
