@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: 0059n
+Build-Jdk: 23
+Implementation-Title: EMK-CRM_Project_backend
+Implementation-Version: 0.0.021-SNAPSHOT
+Implementation-Vendor-Id: com.kindred
+Main-Class: ${start-class}
+
