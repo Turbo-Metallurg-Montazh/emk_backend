@@ -1,5 +1,6 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kindred.emkcrm_project_backend.db.entities.Role;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Collections;
 
 @Service
@@ -22,10 +24,15 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void saveUser(User user) {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+
+    public void createUserFromJson(String json) throws IOException {
+        User user = objectMapper.readValue(json, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByName("ROLE_USER");
         user.setRoles(Collections.singleton(userRole));
         userRepository.save(user);
     }
+
 }

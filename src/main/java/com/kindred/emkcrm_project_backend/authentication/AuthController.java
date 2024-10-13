@@ -1,40 +1,35 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.IOException;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
+@RequestMapping("/api")
 public class AuthController {
-
     @Autowired
-    private AuthenticationManager authenticationManager;
-
+    private JwtTokenProvider jwtTokenProvider;
     @Autowired
-    private JwtTokenProvider tokenProvider;
+    private UserService userService;
 
-    @PostMapping("/login")
-    public JwtAuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
-                            loginRequest.getPassword()
-                    )
-            );
+    @PostMapping("/generate-token")
+    public String generateToken(@RequestBody String username) {
+        return jwtTokenProvider.generateToken(username);
+    }
 
-            String jwt = tokenProvider.generateToken(authentication.getName(), List.of("ROLE_USER"));
-            return new JwtAuthenticationResponse(jwt);
-        } catch (AuthenticationException e) {
-            // Обработка ошибки аутентификации
-            throw new RuntimeException("Ошибка аутентификации");
-        }
+    @PostMapping("/register")
+    public String register(@RequestBody String json) throws IOException {
+        System.out.println("Processing registration data: " + json);
+        userService.createUserFromJson(json);
+
+
+        return "User registered!";
+    }
+
+    @GetMapping("/secure-endpoint")
+    public String secureEndpoint() {
+        return "You have accessed a secure endpoint!";
     }
 }

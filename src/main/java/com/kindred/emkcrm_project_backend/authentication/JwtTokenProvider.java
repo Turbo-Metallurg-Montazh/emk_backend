@@ -2,15 +2,14 @@ package com.kindred.emkcrm_project_backend.authentication;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class JwtTokenProvider {
@@ -21,7 +20,7 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.expire-length:3600000}")
     private long validityInMilliseconds;
 
-    private Key key;
+    private static Key key;
 
     @PostConstruct
     protected void init() {
@@ -31,18 +30,12 @@ public class JwtTokenProvider {
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String generateToken(String username, List<String> roles) {
-        Claims claims = Jwts.claims().setSubject(username);
-        claims.put("roles", roles);
-
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
-
+    public String generateToken(String data) {
         return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .claim("sub", data)  // Add subject claim
+                .claim("iat", new Date())  // Issued at
+                .claim("exp", new Date(System.currentTimeMillis() + validityInMilliseconds))  // Expiration
+                .signWith(key)  // Sign with the SecretKey
                 .compact();
     }
 
@@ -53,6 +46,14 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public Claims getClaimsFromJWT(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public boolean validateToken(String token) {
