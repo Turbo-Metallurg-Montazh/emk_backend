@@ -1,6 +1,5 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +21,7 @@ public class JwtTokenProvider {
 
     private static Key key;
 
+
     @PostConstruct
     protected void init() {
         if (secretKey.length() < 32) {
@@ -30,9 +30,9 @@ public class JwtTokenProvider {
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String generateToken(String data) {
+    public String generateToken(String username) {
         return Jwts.builder()
-                .claim("sub", data)  // Add subject claim
+                .claim("sub", username)
                 .claim("iat", new Date())  // Issued at
                 .claim("exp", new Date(System.currentTimeMillis() + validityInMilliseconds))  // Expiration
                 .signWith(key)  // Sign with the SecretKey
@@ -48,15 +48,8 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
-    public Claims getClaimsFromJWT(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-    }
-
     public boolean validateToken(String token) {
+
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key)

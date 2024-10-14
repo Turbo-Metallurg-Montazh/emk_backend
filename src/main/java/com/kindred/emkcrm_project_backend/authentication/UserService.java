@@ -1,7 +1,5 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kindred.emkcrm_project_backend.db.entities.Role;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
@@ -9,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.Collections;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -19,20 +16,55 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private RoleRepository roleRepository;
 
 
-    public void createUserFromJson(String json) throws IOException {
-        User user = objectMapper.readValue(json, User.class);
+    public void saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByName("ROLE_USER");
-        user.setRoles(Collections.singleton(userRole));
+//
+//        HashSet<Role> setRoles = new HashSet<>();
+//        setRoles.add(new Role("USER"));
+//        setRoles.add(new Role("ADMIN"));
+//        setRoles.add(new Role("OWNER"));
+//        user.setRoles(setRoles);
+        user.setRoles(Set.of(roleRepository.findByName("USER")));
         userRepository.save(user);
     }
 
+    public User validateUsername(LoginRequest loginInfo) {
+        User user = findUserWithRolesByUsername(loginInfo.getData());
+        if (user != null && passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())){
+            return user;
+        }
+        return null;
+    }
+
+    public User validateEmail(LoginRequest loginInfo) {
+        User user = findUserWithRolesByEmail(loginInfo.getData());
+        if (user != null && passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())){
+            return user;
+        }
+        return null;
+    }
+
+    public User findUserWithRolesByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return null;
+        }
+        user.setRoles(roleRepository.findByUsers(Set.of(user)));
+        return user;
+    }
+
+    public User findUserWithRolesByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return null;
+        }
+        user.setRoles(roleRepository.findByUsers(Set.of(user)));
+        return user;
+    }
 }

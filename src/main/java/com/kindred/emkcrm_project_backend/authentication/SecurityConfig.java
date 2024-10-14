@@ -2,6 +2,7 @@ package com.kindred.emkcrm_project_backend.authentication;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig{
 
     private final UserDetail myUserDetailsService;
@@ -28,7 +30,7 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)  // Use the new way to disable CSRF
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/register", "/api/generate-token").permitAll() // Allow these URLs
+                                .requestMatchers("/api/register", "/api/login/username", "/api/login/email").permitAll() // Allow these URLs
                                 .anyRequest().authenticated() // All other requests need to be authenticated
                 )
                 .sessionManagement(session -> session
