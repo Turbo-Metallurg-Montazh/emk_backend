@@ -30,7 +30,7 @@ public class UserService {
 //        setRoles.add(new Role("ADMIN"));
 //        setRoles.add(new Role("OWNER"));
 //        user.setRoles(setRoles);
-        user.setRoles(Set.of(roleRepository.findByName("USER")));
+        //user.setRoles(Set.of(roleRepository.findByName("USER")));
         userRepository.save(user);
     }
 

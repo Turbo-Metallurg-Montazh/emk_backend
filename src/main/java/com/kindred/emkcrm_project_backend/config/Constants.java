@@ -8,6 +8,10 @@ public class Constants {
 
     public static final String FIND_TENDERS_URL = "https://api-zakupki.kontur.ru/external/v1/search?";
 
+    public static final String EMAIL_DOMAIN = "gmail.com";
+    public static final String ACTIVATION_LINK = "http://localhost:8080/api/activate?token=";
+    public static final String ACTIVATION_KEY = "egdfvhfbnqergjgkwoerigjsnfsoflkvnslfg"; // must be more than 32 symbols!!!
+    public static final long EXPIRATION_ACTIVATION_TOKEN = 360000 * 24;
 
     //public static final int MAX_PAGE_COUNT = 10;
     public static final int ITEMS_ON_PAGE = 50;

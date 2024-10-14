@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @SpringBootApplication
 @EnableScheduling
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
+@PreAuthorize("hasRole('USER')")
 public class EmkCrmProjectBackendApplication {
 
     @Autowired
@@ -30,6 +32,6 @@ public class EmkCrmProjectBackendApplication {
         if (answer.isEmpty()) {
             return "Фильтр для тендеров успешно добавлен в БД";
         }
-        return "Фильтр уже существует под названием " + answer;
+        return String.format("Фильтр уже существует под названием %s", answer);
     }
 }

@@ -10,6 +10,9 @@ import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
 
+import static com.kindred.emkcrm_project_backend.config.Constants.ACTIVATION_KEY;
+import static com.kindred.emkcrm_project_backend.config.Constants.EXPIRATION_ACTIVATION_TOKEN;
+
 @Component
 public class JwtTokenProvider {
 
@@ -21,6 +24,8 @@ public class JwtTokenProvider {
 
     private static Key key;
 
+    private static Key activationKey;
+
 
     @PostConstruct
     protected void init() {
@@ -28,6 +33,7 @@ public class JwtTokenProvider {
             throw new IllegalArgumentException("The secret key must be at least 32 characters long");
         }
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        activationKey = Keys.hmacShaKeyFor(ACTIVATION_KEY.getBytes());
     }
 
     public String generateToken(String username) {
@@ -59,5 +65,36 @@ public class JwtTokenProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String generateActivateToken(String email) {
+        return Jwts.builder()
+                .claim("sub", email)
+                .claim("iat", new Date())  // Issued at
+                .claim("exp", new Date(System.currentTimeMillis() + EXPIRATION_ACTIVATION_TOKEN))  // Expiration
+                .signWith(activationKey)  // Sign with the SecretKey
+                .compact();
+    }
+
+    public boolean validateActivationToken(String token) {
+
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(activationKey)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public String getEmailFromActivationToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(activationKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

@@ -26,6 +26,7 @@ public class User {
 
     @Column(name = "username", unique = true)
     private String username;
+    @Column(unique = true)
     private String email;
     private String password;
 
@@ -40,5 +41,8 @@ public class User {
     @Override
     public String toString() {
         return String.format("User{id=%d, username='%s', email='%s', password='%s'}", id, username, email, password);
+    }
+    public void addRoles(Role role) {
+        roles.add(role);
     }
 }
