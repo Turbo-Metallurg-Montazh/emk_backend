@@ -24,9 +24,8 @@ public class EmkCrmProjectBackendApplication {
         SpringApplication.run(EmkCrmProjectBackendApplication.class, args);
     }
 
-
     @GetMapping("/add_tender_filter")
-    public String hell(@RequestParam(value = "name", defaultValue = "ЭМК дефолтный фильтр") String name, @RequestParam(value = "user_id", defaultValue = "0") long userId) throws JsonProcessingException {
+    public String addTenderFilter(@RequestParam(value = "name", defaultValue = "ЭМК дефолтный фильтр") String name, @RequestParam(value = "user_id", defaultValue = "0") long userId) throws JsonProcessingException {
         String answer = addTenderFilter.addNewTenderFilter(name, userId, true, new FindTendersPost(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "2011-12-30T07:43:31.681Z", "2031-12-30T07:43:31.681Z", 1));
 
         if (answer.isEmpty()) {

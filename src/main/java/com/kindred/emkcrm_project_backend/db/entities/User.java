@@ -12,13 +12,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "user_info")
 public class User {
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")

@@ -13,16 +13,13 @@ import static com.kindred.emkcrm_project_backend.config.Constants.*;
 
 public abstract class GetTender {
     public static Tender getTenderInfo(String id) throws JsonProcessingException {
-        String url = GET_TENDER_INFO_URL + id + "?";
+        String url = String.format("%s%s?", GET_TENDER_INFO_URL, id);
         HttpHeaders headers = new HttpHeaders();
         headers.set(API_KEY_HEADER, API_KEY);
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-
-        System.out.println("Response: " + response.getBody());
-
         return TenderDeserializer.deserialize(response.getBody());
     }
 }

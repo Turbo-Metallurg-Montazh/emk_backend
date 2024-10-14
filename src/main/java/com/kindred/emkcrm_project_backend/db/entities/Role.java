@@ -12,10 +12,6 @@ import java.util.Set;
 @Table(name = "roles")
 @NoArgsConstructor
 public class Role {
-    public Role(String role) {
-        this.name = role;
-    }
-
     @Id
     @Column(name = "role_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

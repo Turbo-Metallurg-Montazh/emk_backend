@@ -33,7 +33,6 @@ private RoleRepository roleRepository;
         Set<GrantedAuthority> grantedAuthorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(String.format("ROLE_%s", role.getName())))
                 .collect(Collectors.toSet());
-        System.out.println(grantedAuthorities);
         return new User(user.getUsername(), user.getPassword(), true, true, true, true, grantedAuthorities);
     }
 }

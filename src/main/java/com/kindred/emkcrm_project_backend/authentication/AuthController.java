@@ -67,7 +67,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User userRegistrationInfo) {
-        System.out.println(userRegistrationInfo);
         if (userRegistrationInfo.getUsername() == null || userRegistrationInfo.getEmail() == null || userRegistrationInfo.getUsername().isBlank() || userRegistrationInfo.getEmail().isBlank()) {
             return new ResponseEntity<>("Email and Username are required", HttpStatus.BAD_REQUEST);
         }
@@ -80,8 +79,7 @@ public class AuthController {
         if (userService.findUserWithRolesByUsername(userRegistrationInfo.getUsername()) != null) {
             return new ResponseEntity<>("Username already taken", HttpStatus.CONFLICT);
         }
-
-        userService.saveUser(userRegistrationInfo);
+        userService.encodePasswordAndSaveUser(userRegistrationInfo);
         return sendActivation(userRegistrationInfo.getEmail());
     }
 
@@ -93,18 +91,15 @@ public class AuthController {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
         try {
-            System.out.println("sending activation token: " + activationToken);
             emailService.sendActivationEmail(email, ACTIVATION_LINK + activationToken);
         } catch (MessagingException e) {
             return new ResponseEntity<>(String.format("Error sending activation email: %s",  e), HttpStatus.SERVICE_UNAVAILABLE);
         }
-        System.out.println("activation token sent");
         return new ResponseEntity<>("Activation sent successfully", HttpStatus.OK);
     }
 
     @GetMapping("/activate")
     public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
-        System.out.println("activation started");
         if (!jwtTokenProvider.validateActivationToken(token)) {
             return new ResponseEntity<>("Invalid activation token or expired token", HttpStatus.UNAUTHORIZED);
         }
@@ -116,8 +111,6 @@ public class AuthController {
             return new ResponseEntity<>("User is already activated", HttpStatus.CONFLICT);
         }
         user.addRoles(roleRepository.findByName("USER"));
-        System.out.println(user);
-        System.out.println(user.getRoles());
         userRepository.save(user);
         return new ResponseEntity<>("User activated successfully", HttpStatus.OK);
     }
