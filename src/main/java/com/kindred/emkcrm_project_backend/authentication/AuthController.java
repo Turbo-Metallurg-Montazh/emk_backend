@@ -56,7 +56,6 @@ public class AuthController {
     @PostMapping("/login/username")
     public ResponseEntity<Map<String, String>> loginByUsername(@RequestBody LoginRequest loginRequest) {
         User user = userService.validateUsername(loginRequest);
-        System.out.println(loginRequest);
         if (user == null) {
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Bad login or password");
@@ -83,15 +82,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody User userRegistrationInfo) {
         Map<String, String> response = new HashMap<>();
-        System.out.println(userRegistrationInfo);
         if (userRegistrationInfo.getUsername() == null || userRegistrationInfo.getEmail() == null || userRegistrationInfo.getUsername().isBlank() || userRegistrationInfo.getEmail().isBlank()) {
             response.put("error", "Email and Username are required");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-//        if (!userRegistrationInfo.getEmail().substring(userRegistrationInfo.getEmail().lastIndexOf("@") + 1).equals(EMAIL_DOMAIN)) {
-//            response.put("error", "Email is not valid");
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
+        if (!userRegistrationInfo.getEmail().substring(userRegistrationInfo.getEmail().lastIndexOf("@") + 1).equals(EMAIL_DOMAIN)) {
+            response.put("error", "Email is not valid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
         if (userService.findUserWithRolesByEmail(userRegistrationInfo.getEmail()) != null) {
             response.put("error", "Email already taken");
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
