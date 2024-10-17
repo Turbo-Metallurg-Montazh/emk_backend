@@ -14,5 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
     User findByEmail(String email);
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM user_roles WHERE user_id = :userId", nativeQuery = true)
+    void removeRolesByUserId(@Param("userId") Long userId);
 
 }

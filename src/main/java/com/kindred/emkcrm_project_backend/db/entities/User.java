@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -24,7 +25,7 @@ public class User {
     private String email;
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -35,6 +36,10 @@ public class User {
     @Override
     public String toString() {
         return String.format("User{id=%d, username='%s', email='%s', password='%s'}", id, username, email, password);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, email, password);
     }
     public void addRoles(Role role) {
         roles.add(role);
