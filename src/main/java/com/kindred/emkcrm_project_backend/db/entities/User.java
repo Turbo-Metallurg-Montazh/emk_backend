@@ -1,6 +1,7 @@
 package com.kindred.emkcrm_project_backend.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,5 +38,8 @@ public class User {
     }
     public void addRoles(Role role) {
         roles.add(role);
+    }
+    public void removeRoles(Role role) {
+        roles.remove(role);
     }
 }

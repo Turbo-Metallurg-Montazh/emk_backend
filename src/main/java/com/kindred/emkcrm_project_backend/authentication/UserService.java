@@ -6,8 +6,11 @@ import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+
+import static java.lang.Thread.sleep;
 
 @Service
 public class UserService {
@@ -26,6 +29,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
+
 
     public User validateUsername(LoginRequest loginInfo) {
         User user = findUserWithRolesByUsername(loginInfo.getData());

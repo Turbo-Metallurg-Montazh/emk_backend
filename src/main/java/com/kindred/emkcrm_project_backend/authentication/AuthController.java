@@ -114,4 +114,44 @@ public class AuthController {
         userRepository.save(user);
         return new ResponseEntity<>("User activated successfully", HttpStatus.OK);
     }
+
+    @GetMapping("/add-administrator-role")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<String> addAdministratorRole(@RequestParam("user") String userName) {
+        User user = userService.findUserWithRolesByUsername(userName);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+        if (user.getRoles().contains(roleRepository.findByName("ADMIN"))) {
+            return new ResponseEntity<>("User is already admin", HttpStatus.CONFLICT);
+        }
+        user.addRoles(roleRepository.findByName("ADMIN"));
+        userRepository.save(user);
+        return new ResponseEntity<>(String.format("User %s is now ADMIN", userName), HttpStatus.OK);
+    }
+
+    @GetMapping("/remove-administrator-role")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<String> removeAdministratorRole(@RequestParam("user") String userName) {
+        User user = userService.findUserWithRolesByUsername(userName);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+        user.removeRoles(roleRepository.findByName("ADMIN"));
+        userRepository.save(user);
+        return new ResponseEntity<>(String.format("User %s is not now ADMIN", userName), HttpStatus.OK);
+    }
+
+    @GetMapping("/delete-user")
+    @PreAuthorize("hasRole('OWNER')")
+    public ResponseEntity<String> deleteUser(@RequestParam("user") String userName) {
+        User user = userService.findUserWithRolesByUsername(userName);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        userRepository.delete(user);
+        return new ResponseEntity<>(String.format("User %s deleted", userName), HttpStatus.OK);
+    }
+
 }

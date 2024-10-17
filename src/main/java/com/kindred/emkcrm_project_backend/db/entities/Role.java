@@ -18,7 +18,8 @@ public class Role {
     private Long id;
     @Column(unique = true)
     private String name;
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
     @JsonIgnore
     private Set<User> users;
     @Override
