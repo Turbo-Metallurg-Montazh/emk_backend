@@ -93,7 +93,8 @@ jobs:
           docker push ghcr.io/${{ steps.repo_owner.outputs.owner }}/emk-backend:latest
 
       # -------- COPY FILES TO SERVER ---------
-
+      - name: Debug — list files
+        run: ls -la
       - name: Copy compose & nginx
         uses: appleboy/scp-action@v0.1.7
         with:
