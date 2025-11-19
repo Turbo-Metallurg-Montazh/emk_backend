@@ -1,5 +1,5 @@
 # ---------- STAGE 1: Build ----------
-FROM maven:3.9.6-eclipse-temurin-25 AS build
+FROM 4.0.0-rc-5-amazoncorretto-25-debian-trixie AS build
 WORKDIR /app
 
 # Кэш зависимостей
