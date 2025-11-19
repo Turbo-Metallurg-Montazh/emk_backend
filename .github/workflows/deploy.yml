@@ -2,6 +2,16 @@ name: Deploy Backend to Kindred VPS
 
 on:
   workflow_dispatch:
+    inputs:
+      bump:
+        description: "Which version to bump?"
+        type: choice
+        required: true
+        default: patch
+        options:
+          - major
+          - minor
+          - patch
 
 jobs:
   deploy:
@@ -25,8 +35,24 @@ jobs:
         run: |
           tag="${{ steps.get_tag.outputs.tag }}"
           clean_tag="${tag#v}"
+
           IFS='.' read -r major minor patch <<<"$clean_tag"
-          patch=$((patch+1))
+
+          case "${{ github.event.inputs.bump }}" in
+            major)
+              major=$((major+1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor+1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch+1))
+              ;;
+          esac
+
           new_tag="v$major.$minor.$patch"
           echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
 
