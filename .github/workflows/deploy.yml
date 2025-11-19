@@ -100,9 +100,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: |
-            docker-compose.prod.yml
-            nginx.conf
+          source: "docker-compose.prod.yml nginx.conf"
           target: /home/${{ secrets.VPS_USER }}/emk/emk_crm_backend
 
       # -------- BLUE-GREEN DEPLOY ON VPS ---------
