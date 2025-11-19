@@ -1,5 +1,5 @@
 # ---------- STAGE 1: Build ----------
-FROM 4.0.0-rc-5-amazoncorretto-25-debian-trixie AS build
+FROM maven:4.0.0-rc-5-amazoncorretto-25-debian-trixie AS build
 WORKDIR /app
 
 # Кэш зависимостей
