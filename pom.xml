@@ -12,7 +12,7 @@
     <groupId>com.kindred</groupId>
     <artifactId>EMK-CRM_Project_backend</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.021-SNAPSHOT</version>
+    <version>SNAPSHOT</version>
     <name>EMK-CRM_Project_backend</name>
     <description>EMK-CRM_Project_backend</description>
 
@@ -31,6 +31,7 @@
         <json.version>20250517</json.version>
         <springdoc.version>1.8.0</springdoc.version>
         <jakarta.mail.version>2.0.2</jakarta.mail.version>
+        <junit.jupiter.version>6.0.1</junit.jupiter.version>
     </properties>
 
     <dependencies>
@@ -127,6 +128,13 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
             <version>${jakarta.mail.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
