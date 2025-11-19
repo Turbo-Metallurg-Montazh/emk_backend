@@ -22,7 +22,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: emk_project
     volumes:
-      - postgres_prod_data:/var/lib/postgresql   # ✔ правильная папка для PG 18
+      - postgres_prod_data:/var/lib/postgresql
     networks:
       - emk_network
 
