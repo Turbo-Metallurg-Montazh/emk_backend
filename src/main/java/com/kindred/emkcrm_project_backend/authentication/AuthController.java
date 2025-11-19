@@ -1,12 +1,11 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
+import com.kindred.emkcrm_project_backend.config.EmailProperties;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,25 +14,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.kindred.emkcrm_project_backend.config.Constants.ACTIVATION_LINK;
-import static com.kindred.emkcrm_project_backend.config.Constants.EMAIL_DOMAIN;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api")
 public class AuthController {
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
+    private final EmailService emailService;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final EntityManager entityManager;
+    private final EmailProperties emailProperties;
+
+    public AuthController(
+            JwtTokenProvider jwtTokenProvider,
+            UserService userService,
+            EmailService emailService,
+            RoleRepository roleRepository,
+            UserRepository userRepository,
+            EntityManager entityManager,
+            EmailProperties emailProperties
+    ) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userService = userService;
+        this.emailService = emailService;
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.entityManager = entityManager;
+        this.emailProperties = emailProperties;
+    }
+
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
@@ -86,7 +97,7 @@ public class AuthController {
             response.put("error", "Email and Username are required");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
-        if (!userRegistrationInfo.getEmail().substring(userRegistrationInfo.getEmail().lastIndexOf("@") + 1).equals(EMAIL_DOMAIN)) {
+        if (!userRegistrationInfo.getEmail().substring(userRegistrationInfo.getEmail().lastIndexOf("@") + 1).equals(emailProperties.domain())) {
             response.put("error", "Email is not valid");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
@@ -112,7 +123,7 @@ public class AuthController {
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
         try {
-            emailService.sendActivationEmail(email, ACTIVATION_LINK + activationToken);
+            emailService.sendActivationEmail(email, emailProperties.activation_link() + activationToken);
         } catch (MessagingException e) {
             response.put("error", String.format("Error sending activation email: %s", e));
             return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
@@ -124,10 +135,7 @@ public class AuthController {
     @GetMapping("/activate")
     public ResponseEntity<Map<String, String>> activateAccount(@RequestParam("token") String token) {
         Map<String, String> response = new HashMap<>();
-        if (!jwtTokenProvider.validateActivationToken(token)) {
-            response.put("error", "Invalid activation token or expired token");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
+        jwtTokenProvider.validateActivationToken(token);
         User user = userService.findUserWithRolesByEmail(jwtTokenProvider.getEmailFromActivationToken(token));
         if (user == null) {
             response.put("error", "User not found");

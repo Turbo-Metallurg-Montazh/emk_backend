@@ -3,7 +3,6 @@ package com.kindred.emkcrm_project_backend;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.kindred.emkcrm_project_backend.entities.findTendersPostEntity.FindTendersPost;
 import com.kindred.emkcrm_project_backend.utils.AddTenderFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -17,10 +16,16 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('USER')")
 public class EmkCrmProjectBackendApplication {
 
-    @Autowired
-    private AddTenderFilter addTenderFilter;
+    private final AddTenderFilter addTenderFilter;
 
-    public static void main(String[] args) {
+    public EmkCrmProjectBackendApplication(
+            AddTenderFilter addTenderFilter
+    ) {
+        this.addTenderFilter = addTenderFilter;
+    }
+
+
+    static void main(String[] args) {
         SpringApplication.run(EmkCrmProjectBackendApplication.class, args);
     }
 
@@ -33,4 +38,5 @@ public class EmkCrmProjectBackendApplication {
         }
         return String.format("Фильтр уже существует под названием %s", answer);
     }
+
 }

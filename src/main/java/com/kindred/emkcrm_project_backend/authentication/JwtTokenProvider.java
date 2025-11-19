@@ -1,5 +1,6 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
+import com.kindred.emkcrm_project_backend.config.ActivationProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,14 +8,21 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 
-import static com.kindred.emkcrm_project_backend.config.Constants.ACTIVATION_KEY;
-import static com.kindred.emkcrm_project_backend.config.Constants.EXPIRATION_ACTIVATION_TOKEN;
 
 @Component
 public class JwtTokenProvider {
+
+    private final ActivationProperties activationProperties;
+
+    public JwtTokenProvider(
+            ActivationProperties activationProperties
+    ) {
+        this.activationProperties = activationProperties;
+    }
 
     @Value("${security.jwt.token.secret-key:secret}")
     private String secretKey;
@@ -22,9 +30,9 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.expire-length:3600000}")
     private long validityInMilliseconds;
 
-    private static Key key;
+    private static SecretKey key;
 
-    private static Key activationKey;
+    private static SecretKey activationKey;
 
 
     @PostConstruct
@@ -33,7 +41,7 @@ public class JwtTokenProvider {
             throw new IllegalArgumentException("The secret key must be at least 32 characters long");
         }
         key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        activationKey = Keys.hmacShaKeyFor(ACTIVATION_KEY.getBytes());
+        activationKey = Keys.hmacShaKeyFor(activationProperties.key().getBytes());
     }
 
     public String generateToken(String username) {
@@ -41,26 +49,18 @@ public class JwtTokenProvider {
                 .claim("sub", username)
                 .claim("iat", new Date())  // Issued at
                 .claim("exp", new Date(System.currentTimeMillis() + validityInMilliseconds))  // Expiration
-                .signWith(key)  // Sign with the SecretKey
+                .signWith(key)// Sign with the SecretKey
                 .compact();
     }
 
     public String getUsernameFromJWT(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload().getSubject();
     }
 
     public boolean validateToken(String token) {
 
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
         } catch (Exception e) {
             return false;
@@ -71,30 +71,16 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .claim("sub", email)
                 .claim("iat", new Date())  // Issued at
-                .claim("exp", new Date(System.currentTimeMillis() + EXPIRATION_ACTIVATION_TOKEN))  // Expiration
+                .claim("exp", new Date(System.currentTimeMillis() + activationProperties.expiration_ms()))  // Expiration
                 .signWith(activationKey)  // Sign with the SecretKey
                 .compact();
     }
 
-    public boolean validateActivationToken(String token) {
-
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(activationKey)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    public void validateActivationToken(String token) {
+        Jwts.parser().verifyWith(activationKey).build().parseSignedClaims(token);
     }
 
     public String getEmailFromActivationToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(activationKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        return Jwts.parser().verifyWith(activationKey).build().parseSignedClaims(token).getPayload().getSubject();
     }
 }

@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: EMK-CRM_Project_backend
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+    properties:
+      hibernate:
+        envers:
+          audit_table_suffix: _AUD
+          revision_field_name: rev
+          revision_type_field_name: revtype
+          revision_on_collection_change: true
+
+  mail:
+    host: smtp.mail.ru
+    port: 465
+    username: assistantpro.service@mail.ru
+    password: S7gfSwhJXYC79jqEWVHs
+    protocol: smtps
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+security:
+  jwt:
+    token:
+      secret-key: vuekhbfkfdjhvsbavdkjfhdbavhfkjbvgtdfhjghdxdnljfdhbafjkabvfshjdc
+      expire-length: 3600000 # 1 hour
+
+external-api:
+  kontur:
+    api-key-header: X-Kontur-Apikey
+    api-key: 8759e5bf-ecbc-1a25-381d-6b94fecc09e5
+    get-tender-info-url: https://api-zakupki.kontur.ru/external/v1/purchases/
+    find-tenders-url: https://api-zakupki.kontur.ru/external/v1/search?
+
+email:
+  domain: gmail.com
+  activation-link: http://localhost:8080/api/activate?token=
+  host-email: assistantpro.service@mail.ru
+
+activation:
+  key: egdfvhfbnqergjgkwoerigjsnfsoflkvnslfg # must be >32 chars
+  expiration-ms: 8640000   # 360000 * 24
+
+pagination:
+  items-on-page: 50
+
+schedule:
+  time: "0 53 8 * * ?"
+
+format:
+  date-time: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"

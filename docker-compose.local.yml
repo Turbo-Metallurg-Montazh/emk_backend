@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: emk-postgres-local
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: emk_project
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_local_data:/var/lib/postgresql   # Важно!
+    networks:
+      - emk_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: emk-pgadmin-local
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8888:80"
+    depends_on:
+      - postgres
+    networks:
+      - emk_network
+
+volumes:
+  postgres_local_data:
+
+networks:
+  emk_network:

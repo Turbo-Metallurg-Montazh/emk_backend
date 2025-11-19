@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-import static com.kindred.emkcrm_project_backend.config.Constants.ITEMS_ON_PAGE;
 
 @Data
 public class FoundTendersArray {
@@ -14,7 +13,7 @@ public class FoundTendersArray {
     private int totalPagesCount;
     private FoundTenders foundTenders;
 
-    public void setTotalPagesCount(int totalTendersCount) {
-        this.totalPagesCount = (int) Math.ceil((double) totalTendersCount / ITEMS_ON_PAGE);
+    public void setTotalPagesCount(int totalTendersCount, int itemsOnPage) {
+        this.totalPagesCount = (int) Math.ceil((double) totalTendersCount / itemsOnPage);
     }
 }
