@@ -12,7 +12,7 @@ services:
       - emk_network
 
   backend_blue:
-    image: ghcr.io/Lisi4ka59/emk-backend:${BACKEND_TAG}
+    image: ghcr.io/lisi4ka59/emk-backend:${BACKEND_TAG}
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/emk_project
       SPRING_DATASOURCE_USERNAME: postgres
@@ -22,7 +22,7 @@ services:
       - emk_network
 
   backend_green:
-    image: ghcr.io/Lisi4ka59/emk-backend:${BACKEND_TAG}
+    image: ghcr.io/lisi4ka59/emk-backend:${BACKEND_TAG}
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/emk_project
       SPRING_DATASOURCE_USERNAME: postgres
