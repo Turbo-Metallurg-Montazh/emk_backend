@@ -121,8 +121,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            mkdir -p ~/emk_prod
-            cd ~/emk_prod
+            cd /home/${{ secrets.VPS_USER }}/emk/emk_crm_backend
 
             # заполняем переменные окружения
             echo "BACKEND_TAG=${{ steps.bump.outputs.new_tag }}" > .env.prod
@@ -145,7 +144,7 @@ jobs:
             docker compose --env-file .env.prod up -d
 
             echo "Waiting for app to start..."
-            sleep 5
+            sleep 10
 
             echo "Checking health endpoint..."
             # Если actuator не существует -> деплой успешен

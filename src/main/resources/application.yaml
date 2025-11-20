@@ -37,6 +37,15 @@ security:
       secret-key: vuekhbfkfdjhvsbavdkjfhdbavhfkjbvgtdfhjghdxdnljfdhbafjkabvfshjdc
       expire-length: 3600000 # 1 hour
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
 external-api:
   kontur:
     api-key-header: X-Kontur-Apikey
