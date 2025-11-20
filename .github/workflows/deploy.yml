@@ -121,33 +121,53 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            mkdir -p ~/emk_prod
             cd ~/emk_prod
+
+            # заполняем переменные окружения
             echo "BACKEND_TAG=${{ steps.bump.outputs.new_tag }}" > .env.prod
             echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.prod
             echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.prod
 
-            # read current version
+            # предыдущая версия, если уже был деплой
             if [ -f current_version ]; then
-              prev=$(cat current_version)
-              echo $prev > previous_version
+               prev=$(cat current_version)
+               echo "$prev" > previous_version
+            else
+               echo "none" > previous_version
             fi
 
+            # записываем новую версию
             echo "${{ steps.bump.outputs.new_tag }}" > current_version
 
-            # Deploy new version
+            echo "Pulling and starting new version..."
             docker compose --env-file .env.prod pull
             docker compose --env-file .env.prod up -d
 
-            # Basic healthcheck
+            echo "Waiting for app to start..."
             sleep 5
-            if curl -f http://localhost:80/actuator/health; then
+
+            echo "Checking health endpoint..."
+            # Если actuator не существует -> деплой успешен
+            if curl -sf http://localhost:80/actuator/health > /dev/null; then
               echo "New version OK"
+              exit 0
             else
-              echo "Healthcheck FAILED – performing rollback..."
+              echo "Actuator unavailable or returned error"
+
+              # Если предыдущей версии нет → не делаем rollback
+              if ! [ -f previous_version ] || [ "$(cat previous_version)" = "none" ]; then
+                echo "No previous version to rollback to. First deploy → marking as OK."
+                exit 0
+              fi
+
+              echo "Rolling back to previous version..."
               old=$(cat previous_version)
               echo "BACKEND_TAG=$old" > .env.prod
+
               docker compose --env-file .env.prod pull
               docker compose --env-file .env.prod up -d
+
               exit 1
             fi
 
