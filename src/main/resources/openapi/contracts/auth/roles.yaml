@@ -1,0 +1,193 @@
+admin:
+  get:
+    tags: [Roles]
+    summary: Admin-only endpoint
+    operationId: adminEndpoint
+    responses:
+      '200':
+        description: Success
+        content:
+          text/plain:
+            schema:
+              title: AdminEndpoint200Response
+              type: string
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: AdminEndpoint501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+
+user:
+  get:
+    tags: [Roles]
+    summary: User-only endpoint
+    operationId: userEndpoint
+    responses:
+      '200':
+        description: Success
+        content:
+          text/plain:
+            schema:
+              title: UserEndpoint200Response
+              type: string
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: UserEndpoint501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+
+owner:
+  get:
+    tags: [Roles]
+    summary: Owner-only endpoint
+    operationId: ownerEndpoint
+    responses:
+      '200':
+        description: Success
+        content:
+          text/plain:
+            schema:
+              title: OwnerEndpoint200Response
+              type: string
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: OwnerEndpoint501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+
+addAdmin:
+  get:
+    tags: [Roles]
+    summary: Give ADMIN role to user
+    operationId: addAdministratorRole
+    parameters:
+      - in: query
+        name: user
+        required: true
+        schema:
+          type: string
+
+    responses:
+      '200':
+        description: Role assigned
+        content:
+          application/json:
+            schema:
+              title: AddAdministratorRole200Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              title: AddAdministratorRole404Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: AddAdministratorRole501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+
+removeAdmin:
+  get:
+    tags: [Roles]
+    summary: Remove ADMIN role
+    operationId: removeAdministratorRole
+    parameters:
+      - in: query
+        name: user
+        required: true
+        schema:
+          type: string
+
+    responses:
+      '200':
+        description: Role removed
+        content:
+          application/json:
+            schema:
+              title: RemoveAdministratorRole200Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              title: RemoveAdministratorRole404Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: RemoveAdministratorRole501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+
+deleteUser:
+  get:
+    tags: [Roles]
+    summary: Delete user
+    operationId: deleteUser
+    parameters:
+      - in: query
+        name: user
+        required: true
+        schema:
+          type: string
+
+    responses:
+      '200':
+        description: User deleted
+        content:
+          application/json:
+            schema:
+              title: DeleteUser200Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              title: DeleteUser404Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: DeleteUser501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"

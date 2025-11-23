@@ -42,6 +42,7 @@ services:
       - postgres_data:/var/lib/postgresql/data/18/main
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: emk_project
     networks:
       - emk_network
 

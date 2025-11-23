@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_local_data:/var/lib/postgresql   # Важно!
+      - postgres_local_data:/var/lib/postgresql
     networks:
       - emk_network
 

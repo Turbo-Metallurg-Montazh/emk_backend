@@ -1,0 +1,130 @@
+registerUser:
+  post:
+    tags: [Auth]
+    summary: Register a new user
+    operationId: registerUser
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../models/auth.yaml#/components/schemas/UserRegistrationRequest"
+
+    responses:
+      '200':
+        description: Activation email sent
+        content:
+          application/json:
+            schema:
+              title: RegisterUser200Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+      '400':
+        description: Invalid data
+        content:
+          application/json:
+            schema:
+              title: RegisterUser400Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '409':
+        description: Email or username taken
+        content:
+          application/json:
+            schema:
+              title: RegisterUser409Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: RegisterUser501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+
+activateAccount:
+  get:
+    tags: [Auth]
+    summary: Activate account
+    operationId: activateAccount
+    parameters:
+      - in: query
+        name: token
+        required: true
+        schema:
+          type: string
+
+    responses:
+      '200':
+        description: User activated
+        content:
+          application/json:
+            schema:
+              title: ActivateAccount200Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              title: ActivateAccount404Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: ActivateAccount501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+
+sendActivation:
+  get:
+    tags: [Auth]
+    summary: Send activation email
+    operationId: sendActivation
+    parameters:
+      - in: query
+        name: email
+        required: true
+        schema:
+          type: string
+
+    responses:
+      '200':
+        description: Activation email sent
+        content:
+          application/json:
+            schema:
+              title: SendActivation200Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+      '404':
+        description: User not found
+        content:
+          application/json:
+            schema:
+              title: SendActivation404Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: SendActivation501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"

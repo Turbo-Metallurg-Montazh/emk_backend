@@ -1,0 +1,37 @@
+openapi: 3.0.3
+info:
+  title: Authentication API
+  version: 1.0.0
+
+paths:
+  /api/login/username:
+    $ref: "./contracts/auth/login.yaml#/loginByUsername"
+  /api/login/email:
+    $ref: "./contracts/auth/login.yaml#/loginByEmail"
+
+  /api/register:
+    $ref: "./contracts/auth/register.yaml#/registerUser"
+
+  /api/send-activation:
+    $ref: "./contracts/auth/register.yaml#/sendActivation"
+
+  /api/activate:
+    $ref: "./contracts/auth/register.yaml#/activateAccount"
+
+  /api/admin:
+    $ref: "./contracts/auth/roles.yaml#/admin"
+
+  /api/user:
+    $ref: "./contracts/auth/roles.yaml#/user"
+
+  /api/owner:
+    $ref: "./contracts/auth/roles.yaml#/owner"
+
+  /api/add-administrator-role:
+    $ref: "./contracts/auth/roles.yaml#/addAdmin"
+
+  /api/remove-administrator-role:
+    $ref: "./contracts/auth/roles.yaml#/removeAdmin"
+
+  /api/delete-user:
+    $ref: "./contracts/auth/roles.yaml#/deleteUser"
