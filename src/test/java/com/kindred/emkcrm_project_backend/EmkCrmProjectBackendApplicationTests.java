@@ -8,7 +8,7 @@ class EmkCrmProjectBackendApplicationTests {
 
     @Test
     void contextLoads() {
-        throw new NullPointerException();
+        System.out.println("Hello World");
     }
 
 }
