@@ -14,9 +14,8 @@ jobs:
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/emk_project
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      MAIL_PASSWORD: mail_pass
+      MAIL_PASSWORD: super-secret-jwt-token
       JWT_SECRET: super_secret_jwt_token
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
