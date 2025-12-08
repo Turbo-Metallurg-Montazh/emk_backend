@@ -211,16 +211,13 @@
                             <invokerPackage>com.kindred.emkcrm.invoker</invokerPackage>
 
                             <configOptions>
+                                <delegatePattern>true</delegatePattern>
+                                <useResponseEntity>true</useResponseEntity>
+                                <interfaceOnly>false</interfaceOnly>
                                 <useTags>true</useTags>
                                 <useJakartaEe>true</useJakartaEe>
-                                <delegatePattern>true</delegatePattern>
                                 <useBeanValidation>true</useBeanValidation>
-                                <modelNameSuffix>Dto</modelNameSuffix>
-                                <useResponseEntity>false</useResponseEntity>
-                                <generateResponseModels>true</generateResponseModels>
-                                <generateResponseInterfaces>true</generateResponseInterfaces>
-                                <useOneOfInterfaces>true</useOneOfInterfaces>
-                                <useAllOfInterfaces>true</useAllOfInterfaces>
+                                <generateModels>true</generateModels>
                             </configOptions>
 
                             <generateApiTests>false</generateApiTests>
