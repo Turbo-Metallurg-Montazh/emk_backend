@@ -8,6 +8,7 @@ class EmkCrmProjectBackendApplicationTests {
 
     @Test
     void contextLoads() {
+        throw new NullPointerException();
     }
 
 }
