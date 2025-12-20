@@ -9,7 +9,7 @@ RUN mvn -B -q dependency:go-offline
 
 # Копируем исходники и собираем JAR
 COPY src ./src
-RUN mvn -B -q -DskipTests package
+RUN mvn -B -q -Dmaven.test.skip=true package
 
 # ---------- STAGE 2: Runtime ----------
 FROM eclipse-temurin:25-jre
