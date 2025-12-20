@@ -1,187 +1,36 @@
-name: Deploy Backend to Kindred VPS
+name: Deploy Backend to VPS
 
 on:
-  workflow_dispatch:
-    inputs:
-      bump:
-        description: "Which version to bump?"
-        type: choice
-        required: true
-        default: patch
-        options:
-          - major
-          - minor
-          - patch
+  push:
+    branches: [ "master" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # ---------------- TAGGING -------------------
-
-      - name: Get latest tag
-        id: get_tag
-        run: |
-          tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "tag=$tag" >> $GITHUB_OUTPUT
-
-      - name: Bump version
-        id: bump
-        run: |
-          tag="${{ steps.get_tag.outputs.tag }}"
-          clean_tag="${tag#v}"
-
-          IFS='.' read -r major minor patch <<<"$clean_tag"
-
-          case "${{ github.event.inputs.bump }}" in
-            major)
-              major=$((major+1))
-              minor=0
-              patch=0
-              ;;
-            minor)
-              minor=$((minor+1))
-              patch=0
-              ;;
-            patch)
-              patch=$((patch+1))
-              ;;
-          esac
-
-          new_tag="v$major.$minor.$patch"
-          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
-
-      - name: Create and push new tag
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          git tag ${{ steps.bump.outputs.new_tag }}
-          git push origin ${{ steps.bump.outputs.new_tag }}
-
-      # -------- BUILD & PUSH DOCKER IMAGES ---------
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '25'
-
-      - name: Set lowercase owner
-        id: repo_owner
-        run: echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
-
-      - name: Build Docker
-        run: |
-          docker build \
-            -t ghcr.io/${{ steps.repo_owner.outputs.owner }}/emk-backend:${{ steps.bump.outputs.new_tag }} \
-            -t ghcr.io/${{ steps.repo_owner.outputs.owner }}/emk-backend:latest \
-            .
-
-      - uses: docker/login-action@v3
+      # 🔐 Логин в GHCR
+      - name: Login to GHCR
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push Docker images
-        run: |
-          docker push ghcr.io/${{ steps.repo_owner.outputs.owner }}/emk-backend:${{ steps.bump.outputs.new_tag }}
-          docker push ghcr.io/${{ steps.repo_owner.outputs.owner }}/emk-backend:latest
-
-      # -------- COPY FILES TO SERVER ---------
-
-      - name: Copy docker-compose.prod.yml
-        uses: appleboy/scp-action@v0.1.7
+      # 🐳 Build + Push образа
+      - name: Build & Push Backend image
+        uses: docker/build-push-action@v6
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: "docker-compose.prod.yml"
-          target: "/home/${{ secrets.VPS_USER }}/emk/emk_crm_backend"
+          context: .
+          push: true
+          tags: ghcr.io/turbo-metallurg-montazh/emk-backend:${{ github.sha }}
 
-      - name: Copy nginx.conf
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: "nginx.conf"
-          target: "/home/${{ secrets.VPS_USER }}/emk/emk_crm_backend"
-
-      # -------- BLUE-GREEN DEPLOY ON VPS ---------
-
-      - name: Blue-Green deploy
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /home/${{ secrets.VPS_USER }}/emk/emk_crm_backend
-
-            # заполняем переменные окружения
-            echo "BACKEND_TAG=${{ steps.bump.outputs.new_tag }}" > .env.prod
-            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.prod
-            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.prod
-
-            # предыдущая версия, если уже был деплой
-            if [ -f current_version ]; then
-               prev=$(cat current_version)
-               echo "$prev" > previous_version
-            else
-               echo "none" > previous_version
-            fi
-
-            # записываем новую версию
-            echo "${{ steps.bump.outputs.new_tag }}" > current_version
-
-            echo "Pulling and starting new version..."
-            docker compose --env-file .env.prod pull
-            docker compose --env-file .env.prod up -d
-
-            echo "Waiting for app to start..."
-            sleep 10
-
-            echo "Checking health endpoint..."
-            # Если actuator не существует -> деплой успешен
-            if curl -sf http://localhost:80/actuator/health > /dev/null; then
-              echo "New version OK"
-              exit 0
-            else
-              echo "Actuator unavailable or returned error"
-
-              # Если предыдущей версии нет → не делаем rollback
-              if ! [ -f previous_version ] || [ "$(cat previous_version)" = "none" ]; then
-                echo "No previous version to rollback to. First deploy → marking as OK."
-                exit 0
-              fi
-
-              echo "Rolling back to previous version..."
-              old=$(cat previous_version)
-              echo "BACKEND_TAG=$old" > .env.prod
-
-              docker compose --env-file .env.prod pull
-              docker compose --env-file .env.prod up -d
-
-              exit 1
-            fi
-
-      # -------- TELEGRAM NOTIFICATIONS ---------
-
-      - name: Send success message
-        if: success()
+      # 🚀 Deploy в k3s
+      - name: Deploy to k3s
         run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="🚀 Deploy successful! Version: ${{ steps.bump.outputs.new_tag }}"
-
-      - name: Send failure message
-        if: failure()
-        run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="❌ Deploy FAILED! Rolled back to previous version."
+          echo "${{ secrets.K3S_KUBECONFIG }}" > kubeconfig
+          sed -i "s|image: .*|image: ghcr.io/turbo-metallurg-montazh/emk-backend:${{ github.sha }}|" k8s/deployment.yaml
+          kubectl --kubeconfig=kubeconfig apply -f k8s/
