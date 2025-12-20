@@ -231,6 +231,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>
+                        com.kindred.emkcrm_project_backend.EmkCrmProjectBackendApplication
+                    </mainClass>
+                </configuration>
             </plugin>
 
             <!-- COMPILATION (LOMBOK + MAPSTRUCT) -->
