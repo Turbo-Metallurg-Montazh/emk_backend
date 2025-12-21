@@ -30,9 +30,9 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: backend-secrets
-                  key: POSTGRES_PASSWORD
+                  key: SPRING_DATASOURCE_PASSWORD
           volumeMounts:
-            - mountPath: /var/lib/postgresql/data
+            - mountPath: /var/lib/postgresql
               name: data
       volumes:
         - name: data
