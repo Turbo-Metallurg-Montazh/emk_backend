@@ -42,9 +42,19 @@ spec:
           env:
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://postgres:5432/emk_project
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
           envFrom:
             - secretRef:
                 name: backend-secrets
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
