@@ -60,12 +60,12 @@ security:
 
 logging:
   level:
-    org.springframework.boot.autoconfigure: DEBUG
-    org.springframework.jdbc: DEBUG
-    org.hibernate: INFO
-    com.zaxxer.hikari: DEBUG
-    org.flywaydb: DEBUG
     root: INFO
+    com.kindred.emkcrm_project_backend: INFO
+    org.springframework: WARN
+    org.hibernate: WARN
+    com.zaxxer.hikari: WARN
+    org.flywaydb: INFO
 
 management:
   endpoints:

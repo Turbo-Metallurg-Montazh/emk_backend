@@ -27,7 +27,7 @@ public class SecurityConfig{
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)  // Use the new way to disable CSRF
                 .cors(cors -> cors.configurationSource(request -> {
@@ -40,6 +40,7 @@ public class SecurityConfig{
                 }))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
+                                .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints for Kubernetes probes
                                 .requestMatchers("/api/register", "/api/login/username", "/api/login/email", "/api/activate", "/api/send-activation", "/api/download", "/api/ask").permitAll() // Allow these URLs
                                 .anyRequest().authenticated() // All other requests need to be authenticated
                 )
