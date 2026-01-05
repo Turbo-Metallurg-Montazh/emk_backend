@@ -1,0 +1,5 @@
+# Игнорируем генерацию тестовых классов
+**/*Test*.java
+**/test/**/*.java
+**/OpenApiGeneratorApplicationTests.java
+
