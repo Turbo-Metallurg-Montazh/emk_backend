@@ -2,6 +2,9 @@ loginByUsername:
   post:
     tags: [Auth]
     summary: Login using username
+    description: >
+      Аутентификация по корпоративному username. Username формируется автоматически
+      на основе ФИО сотрудника (например: m.nachinkin, m.a.nachinkin, m.a.nachinkin1).
     operationId: loginByUsername
 
     requestBody:
@@ -37,48 +40,5 @@ loginByUsername:
           application/json:
             schema:
               title: LoginByUsername501Response
-              allOf:
-                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
-
-
-loginByEmail:
-  post:
-    tags: [Auth]
-    summary: Login using email
-    operationId: loginByEmail
-
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: "../../models/auth.yaml#/components/schemas/LoginRequest"
-
-    responses:
-
-      '200':
-        description: Login successful
-        content:
-          application/json:
-            schema:
-              title: LoginByEmail200Response
-              allOf:
-                - $ref: "../../models/auth.yaml#/components/schemas/TokenResponse"
-
-      '401':
-        description: Invalid login or password
-        content:
-          application/json:
-            schema:
-              title: LoginByEmail401Response
-              allOf:
-                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
-
-      '501':
-        description: Not implemented
-        content:
-          application/json:
-            schema:
-              title: LoginByEmail501Response
               allOf:
                 - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"

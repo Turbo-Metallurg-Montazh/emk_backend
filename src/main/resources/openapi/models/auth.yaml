@@ -39,3 +39,42 @@ components:
       properties:
         error:
           type: string
+
+    AdminUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+
+    AdminCreateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        middleName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required: [firstName, lastName, email, password]
+
+    AdminResetPasswordRequest:
+      type: object
+      properties:
+        newPassword:
+          type: string
+      required: [newPassword]

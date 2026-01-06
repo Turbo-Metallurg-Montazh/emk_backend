@@ -1,23 +1,18 @@
 openapi: 3.0.3
 info:
-  title: Authentication API
-  version: 1.0.0
+  title: Corporate Authentication API
+  version: 2.0.0
+  description: >
+    Аутентификация пользователей во внутренней корпоративной сети.
+    Самостоятельная регистрация отключена; учетные записи создаются и управляются администраторами
+    во внешних системах (например, LDAP/Active Directory).
 
 paths:
+  # Аутентификация пользователя (корпоративная учетная запись)
   /api/login/username:
     $ref: "./contracts/auth/login.yaml#/loginByUsername"
-  /api/login/email:
-    $ref: "./contracts/auth/login.yaml#/loginByEmail"
 
-  /api/register:
-    $ref: "./contracts/auth/register.yaml#/registerUser"
-
-  /api/send-activation:
-    $ref: "./contracts/auth/register.yaml#/sendActivation"
-
-  /api/activate:
-    $ref: "./contracts/auth/register.yaml#/activateAccount"
-
+  # Ролевые эндпоинты для проверки прав доступа внутри CRM
   /api/admin:
     $ref: "./contracts/auth/roles.yaml#/admin"
 
@@ -35,3 +30,13 @@ paths:
 
   /api/delete-user:
     $ref: "./contracts/auth/roles.yaml#/deleteUser"
+
+  # Эндпоинты панели администратора для управления пользователями
+  /api/admin/users:
+    $ref: "./contracts/auth/admin-users.yaml#/adminUsers"
+
+  /api/admin/users/{username}:
+    $ref: "./contracts/auth/admin-users.yaml#/adminUserByUsername"
+
+  /api/admin/users/{username}/reset-password:
+    $ref: "./contracts/auth/admin-users.yaml#/adminUserResetPassword"
