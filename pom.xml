@@ -36,6 +36,7 @@
         <openapi.version>7.17.0</openapi.version>
         <springdoc.version>3.0.0</springdoc.version>
         <jackson.version>0.2.8</jackson.version>
+        <micrometer.version>1.16.1</micrometer.version>
     </properties>
 
     <dependencies>
@@ -74,6 +75,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- PROMETHEUS -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <version>${micrometer.version}</version>
         </dependency>
 
         <!-- POSTGRES -->

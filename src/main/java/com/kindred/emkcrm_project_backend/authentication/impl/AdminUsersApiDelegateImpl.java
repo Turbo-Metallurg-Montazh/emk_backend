@@ -17,8 +17,7 @@ import com.kindred.emkcrm_project_backend.services.email.EmailService;
 import com.kindred.emkcrm_project_backend.utils.PasswordGenerator;
 import com.kindred.emkcrm_project_backend.utils.UsernameGenerator;
 import jakarta.mail.MessagingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,11 +28,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminUsersApiDelegateImpl.class);
-    
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UsernameGenerator usernameGenerator;
@@ -114,7 +112,7 @@ public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
             emailService.sendRegistrationEmail(saved.getEmail(), username, password, emailProperties.login_url());
         } catch (MessagingException e) {
             // Логируем ошибку, но не прерываем создание пользователя
-            logger.error("Failed to send registration email to {}: {}", saved.getEmail(), e.getMessage(), e);
+            log.error("Failed to send registration email to {}: {}", saved.getEmail(), e.getMessage(), e);
         }
         
         return new ResponseEntity<>(toDto(saved), HttpStatus.CREATED);
