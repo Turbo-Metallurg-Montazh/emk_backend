@@ -1,8 +1,10 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
-import com.kindred.emkcrm_project_backend.authentication.dto.AdminCreateUserRequest;
-import com.kindred.emkcrm_project_backend.authentication.dto.AdminResetPasswordRequest;
-import com.kindred.emkcrm_project_backend.authentication.dto.AdminUserDto;
+import com.kindred.emkcrm.api.AdminUsersApiDelegate;
+import com.kindred.emkcrm.model.AdminCreateUserRequest;
+import com.kindred.emkcrm.model.AdminResetPasswordRequest;
+import com.kindred.emkcrm.model.AdminUserDto;
+import com.kindred.emkcrm.model.MessageResponse;
 import com.kindred.emkcrm_project_backend.db.entities.Role;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
@@ -15,23 +17,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/api/admin/users")
-@PreAuthorize("hasRole('ADMIN')")
-public class AdminUserController {
+@Service
+public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UsernameGenerator usernameGenerator;
     private final PasswordEncoder passwordEncoder;
 
-    public AdminUserController(
+    public AdminUsersApiDelegateImpl(
             UserRepository userRepository,
             RoleRepository roleRepository,
             UsernameGenerator usernameGenerator,
@@ -43,7 +43,8 @@ public class AdminUserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AdminUserDto>> listUsers() {
         List<AdminUserDto> users = userRepository.findAll().stream()
                 .map(this::toDto)
@@ -51,8 +52,9 @@ public class AdminUserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<AdminUserDto> getUserByUsername(@PathVariable String username) {
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdminUserDto> getUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NotFoundException("User not found");
@@ -60,8 +62,9 @@ public class AdminUserController {
         return new ResponseEntity<>(toDto(user), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<AdminUserDto> createUser(@RequestBody AdminCreateUserRequest request) {
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdminUserDto> createUser(AdminCreateUserRequest request) {
         if (request.getFirstName() == null || request.getLastName() == null ||
                 request.getEmail() == null || request.getPassword() == null) {
             throw new BadRequestException("firstName, lastName, email and password are required");
@@ -73,7 +76,7 @@ public class AdminUserController {
 
         String username = usernameGenerator.generateUniqueUsername(
                 request.getFirstName(),
-                request.getMiddleName(),
+                request.getMiddleName().orElse(""),
                 request.getLastName()
         );
 
@@ -93,21 +96,23 @@ public class AdminUserController {
         return new ResponseEntity<>(toDto(saved), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{username}")
-    public ResponseEntity<Void> deleteUserByUsername(@PathVariable String username) {
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MessageResponse> deleteUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new NotFoundException("User not found");
         }
         userRepository.delete(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        
+        MessageResponse response = new MessageResponse();
+        response.setMessage(String.format("User %s deleted", username));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/{username}/reset-password")
-    public ResponseEntity<Void> resetPassword(
-            @PathVariable String username,
-            @RequestBody AdminResetPasswordRequest request
-    ) {
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<MessageResponse> resetUserPassword(String username, AdminResetPasswordRequest request) {
         if (request.getNewPassword() == null || request.getNewPassword().isBlank()) {
             throw new BadRequestException("newPassword is required");
         }
@@ -117,15 +122,20 @@ public class AdminUserController {
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        return new ResponseEntity<>(HttpStatus.OK);
+        
+        MessageResponse response = new MessageResponse();
+        response.setMessage(String.format("Password for user %s has been reset", username));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     private AdminUserDto toDto(User user) {
-        Set<String> roleNames = user.getRoles() != null
-                ? user.getRoles().stream().map(Role::getName).collect(Collectors.toSet())
-                : Set.of();
-        return new AdminUserDto(user.getUsername(), user.getEmail(), roleNames);
+        List<String> roleNames = user.getRoles() != null
+                ? user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+                : List.of();
+        return new AdminUserDto()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .roles(roleNames);
     }
 }
-
 
