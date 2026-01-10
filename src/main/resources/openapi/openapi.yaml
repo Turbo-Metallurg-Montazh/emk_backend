@@ -9,34 +9,34 @@ info:
 
 paths:
   # Аутентификация пользователя (корпоративная учетная запись)
-  /api/login/username:
+  /login/username:
     $ref: "./contracts/auth/login.yaml#/loginByUsername"
 
   # Ролевые эндпоинты для проверки прав доступа внутри CRM
-  /api/admin:
+  /admin:
     $ref: "./contracts/auth/roles.yaml#/admin"
 
-  /api/user:
+  /user:
     $ref: "./contracts/auth/roles.yaml#/user"
 
-  /api/owner:
+  /owner:
     $ref: "./contracts/auth/roles.yaml#/owner"
 
-  /api/add-administrator-role:
+  /add-administrator-role:
     $ref: "./contracts/auth/roles.yaml#/addAdmin"
 
-  /api/remove-administrator-role:
+  /remove-administrator-role:
     $ref: "./contracts/auth/roles.yaml#/removeAdmin"
 
-  /api/delete-user:
+  /delete-user:
     $ref: "./contracts/auth/roles.yaml#/deleteUser"
 
   # Эндпоинты панели администратора для управления пользователями
-  /api/admin/users:
+  /admin/users:
     $ref: "./contracts/auth/admin-users.yaml#/adminUsers"
 
-  /api/admin/users/{username}:
+  /admin/users/{username}:
     $ref: "./contracts/auth/admin-users.yaml#/adminUserByUsername"
 
-  /api/admin/users/{username}/reset-password:
+  /admin/users/{username}/reset-password:
     $ref: "./contracts/auth/admin-users.yaml#/adminUserResetPassword"

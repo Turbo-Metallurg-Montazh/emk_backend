@@ -41,7 +41,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints for Kubernetes probes
-                                .requestMatchers("/api/register", "/api/login/username", "/api/activate", "/api/send-activation", "/api/download", "/api/ask").permitAll() // Allow these URLs
+                                .requestMatchers("/register", "/login/username", "/activate", "/send-activation", "/download", "/ask").permitAll() // Allow these URLs
                                 .anyRequest().authenticated() // All other requests need to be authenticated
                 )
                 .sessionManagement(session -> session

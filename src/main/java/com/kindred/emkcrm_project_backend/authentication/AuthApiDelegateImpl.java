@@ -23,13 +23,10 @@ public class AuthApiDelegateImpl implements AuthApiDelegate {
     }
 
     @Override
-    public ResponseEntity<TokenResponse> loginByUsername(com.kindred.emkcrm.model.LoginRequest loginRequest) {
-        // Создаем адаптер для старого LoginRequest
-        LoginRequest oldLoginRequest = new LoginRequest();
-        oldLoginRequest.setData(loginRequest.getUsername());
-        oldLoginRequest.setPassword(loginRequest.getPassword());
+    public ResponseEntity<TokenResponse> loginByUsername(LoginRequest loginRequest) {
 
-        User user = userService.validateUsername(oldLoginRequest);
+
+        User user = userService.validateUsername(loginRequest);
         if (user == null) {
             throw new UnauthorizedException("Bad login or password");
         }
