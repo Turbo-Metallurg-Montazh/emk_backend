@@ -4,7 +4,7 @@ import com.kindred.emkcrm.model.LoginRequest;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.kindred.emkcrm_project_backend.exception.UnauthorizedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +13,15 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private RoleRepository roleRepository;
+    public UserService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     public void encodePasswordAndSaveUser(User user) {
@@ -34,7 +35,7 @@ public class UserService {
         if (user != null && passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())){
             return user;
         }
-        return null;
+        throw new UnauthorizedException("Bad login or password");
     }
 
 

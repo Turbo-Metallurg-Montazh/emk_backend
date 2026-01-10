@@ -1,7 +1,8 @@
-package com.kindred.emkcrm_project_backend.authentication;
+package com.kindred.emkcrm_project_backend.authentication.impl;
 
 import com.kindred.emkcrm.api.RolesApiDelegate;
 import com.kindred.emkcrm.model.MessageResponse;
+import com.kindred.emkcrm_project_backend.authentication.UserService;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;

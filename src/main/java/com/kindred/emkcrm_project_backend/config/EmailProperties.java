@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record EmailProperties(
         String domain,
         String activation_link,
-        String host_email
+        String host_email,
+        String login_url
 ) {
 }

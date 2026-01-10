@@ -2,7 +2,7 @@ package com.kindred.emkcrm_project_backend.authentication;
 
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jspecify.annotations.NonNull;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,13 +18,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserDetail implements UserDetailsService {
-@Autowired
-private UserRepository userRepository;
-@Autowired
-private RoleRepository roleRepository;
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+
+    public UserDetail(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         com.kindred.emkcrm_project_backend.db.entities.User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);

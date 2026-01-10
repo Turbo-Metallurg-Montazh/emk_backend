@@ -1,4 +1,4 @@
-package com.kindred.emkcrm_project_backend.authentication;
+package com.kindred.emkcrm_project_backend.authentication.impl;
 
 import com.kindred.emkcrm.api.AdminUsersApiDelegate;
 import com.kindred.emkcrm.model.AdminCreateUserRequest;
@@ -12,7 +12,13 @@ import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
 import com.kindred.emkcrm_project_backend.exception.BadRequestException;
 import com.kindred.emkcrm_project_backend.exception.ConflictException;
 import com.kindred.emkcrm_project_backend.exception.NotFoundException;
+import com.kindred.emkcrm_project_backend.config.EmailProperties;
+import com.kindred.emkcrm_project_backend.services.email.EmailService;
+import com.kindred.emkcrm_project_backend.utils.PasswordGenerator;
 import com.kindred.emkcrm_project_backend.utils.UsernameGenerator;
+import jakarta.mail.MessagingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,21 +32,32 @@ import java.util.stream.Collectors;
 @Service
 public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminUsersApiDelegateImpl.class);
+    
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final UsernameGenerator usernameGenerator;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordGenerator passwordGenerator;
+    private final EmailService emailService;
+    private final EmailProperties emailProperties;
 
     public AdminUsersApiDelegateImpl(
             UserRepository userRepository,
             RoleRepository roleRepository,
             UsernameGenerator usernameGenerator,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            PasswordGenerator passwordGenerator,
+            EmailService emailService,
+            EmailProperties emailProperties
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.usernameGenerator = usernameGenerator;
         this.passwordEncoder = passwordEncoder;
+        this.passwordGenerator = passwordGenerator;
+        this.emailService = emailService;
+        this.emailProperties = emailProperties;
     }
 
     @Override
@@ -65,11 +82,6 @@ public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AdminUserDto> createUser(AdminCreateUserRequest request) {
-        if (request.getFirstName() == null || request.getLastName() == null ||
-                request.getEmail() == null || request.getPassword() == null) {
-            throw new BadRequestException("firstName, lastName, email and password are required");
-        }
-
         if (userRepository.findByEmail(request.getEmail()) != null) {
             throw new ConflictException("Email already taken");
         }
@@ -80,10 +92,13 @@ public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
                 request.getLastName()
         );
 
+        // Генерируем пароль автоматически
+        String password = passwordGenerator.generatePassword();
+
         User user = new User();
         user.setUsername(username);
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(password));
 
         if (request.getRoles() != null && !request.getRoles().isEmpty()) {
             Set<Role> roles = request.getRoles().stream()
@@ -93,6 +108,15 @@ public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
         }
 
         User saved = userRepository.save(user);
+        
+        // Отправляем email с учетными данными
+        try {
+            emailService.sendRegistrationEmail(saved.getEmail(), username, password, emailProperties.login_url());
+        } catch (MessagingException e) {
+            // Логируем ошибку, но не прерываем создание пользователя
+            logger.error("Failed to send registration email to {}: {}", saved.getEmail(), e.getMessage(), e);
+        }
+        
         return new ResponseEntity<>(toDto(saved), HttpStatus.CREATED);
     }
 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .credentials {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        .credential-item {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+        .value {
+            color: #2c3e50;
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #3498db;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Добро пожаловать в систему EMK-CRM!</h1>
+        <p>Ваш аккаунт был успешно создан администратором системы.</p>
+        
+        <div class="credentials">
+            <div class="credential-item">
+                <span class="label">Имя пользователя:</span>
+                <span class="value">{{USERNAME}}</span>
+            </div>
+            <div class="credential-item">
+                <span class="label">Пароль:</span>
+                <span class="value">{{PASSWORD}}</span>
+            </div>
+        </div>
+        
+        <p>Пожалуйста, сохраните эти данные в безопасном месте. Рекомендуем изменить пароль после первого входа в систему.</p>
+        
+        <p style="text-align: center;">
+            <a href="{{LOGIN_URL}}" class="button">Перейти на страницу входа</a>
+        </p>
+        
+        <div class="footer">
+            <p>Если вы не запрашивали создание аккаунта, пожалуйста, свяжитесь с администратором системы.</p>
+            <p>Это автоматическое письмо, пожалуйста, не отвечайте на него.</p>
+        </div>
+    </div>
+</body>
+</html>
+

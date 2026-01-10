@@ -87,6 +87,7 @@ email:
   domain: gmail.com
   activation-link: http://localhost:8080/api/activate?token=
   host-email: assistantpro.service@mail.ru
+  login-url: https://turbo-metallurg-montazh.ru/login
 
 activation:
   key: egdfvhfbnqergjgkwoerigjsnfsoflkvnslfg # must be >32 chars

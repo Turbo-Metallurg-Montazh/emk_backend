@@ -27,7 +27,8 @@ adminUsers:
     tags: [AdminUsers]
     summary: Create user
     description: >
-      Создание нового пользователя администратором. Username генерируется автоматически на основе ФИО.
+      Создание нового пользователя администратором. Username и пароль генерируются автоматически.
+      Пароль отправляется на email пользователя вместе с username и ссылкой на страницу входа.
     operationId: createUser
     requestBody:
       required: true
