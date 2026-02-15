@@ -109,5 +109,5 @@ public-ai:
   cloudflare:
     account-id: bccbe013de4159db55636a772d180bba
     api-token: sfFoierAdCQ1G2RoN6JUKHoYgw5CqXm7W9PyvSct
-    model: "@cf/meta/llama-3.1-8b-instruct"
+    model: "@cf/openai/gpt-oss-120b"
   timeout-seconds: 60
