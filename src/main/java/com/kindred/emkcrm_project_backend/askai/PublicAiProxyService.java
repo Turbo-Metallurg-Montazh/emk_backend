@@ -1,6 +1,7 @@
 package com.kindred.emkcrm_project_backend.askai;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kindred.emkcrm_project_backend.model.PublicAiChatMessage;
 import com.kindred.emkcrm_project_backend.model.PublicAiChatRequest;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,8 @@ public class PublicAiProxyService {
 
     private final RestClient restClient;
     private final String model;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public PublicAiProxyService(
             @Value("${public-ai.cloudflare.account-id}") String accountId,
@@ -54,25 +57,28 @@ public class PublicAiProxyService {
 
     public String ask(PublicAiChatRequest req) {
         List<CfMessage> messages = buildMessages(req);
-
         CfChatRequest payload = new CfChatRequest(messages);
 
         try {
-            CfChatResponse raw = restClient.post()
+            CfChatResponse cf = restClient.post()
                     .uri("/" + model)
                     .body(payload)
                     .retrieve()
                     .body(CfChatResponse.class);
 
-            if (raw == null ||
-                    raw.result() == null ||
-                    raw.result().choices() == null ||
-                    raw.result().choices().isEmpty() ||
-                    raw.result().choices().getFirst().message() == null) {
+            if (cf == null || cf.result() == null || cf.result().response() == null)
                 return "";
-            }
 
-            return raw.result().choices().getFirst().message().content();
+            // ВТОРОЙ ПАРСИНГ
+            OpenAiChatResponse openai = objectMapper.readValue(
+                    cf.result().response(),
+                    OpenAiChatResponse.class
+            );
+
+            if (openai.choices() == null || openai.choices().isEmpty())
+                return "";
+
+            return openai.choices().getFirst().message().content();
 
         } catch (Exception e) {
             throw new ResponseStatusException(
