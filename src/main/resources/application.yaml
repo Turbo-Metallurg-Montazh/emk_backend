@@ -75,6 +75,9 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    mail:
+      enabled: false
 
 external-api:
   kontur:
@@ -84,7 +87,7 @@ external-api:
     find-tenders-url: https://api-zakupki.kontur.ru/external/v1/search?
 
 email:
-  domain: gmail.com
+  domain: mail.com
   activation-link: http://localhost:8080/api/activate?token=
   host-email: assistantpro.service@mail.ru
   login-url: https://turbo-metallurg-montazh.ru/login
