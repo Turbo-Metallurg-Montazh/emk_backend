@@ -106,6 +106,8 @@ format:
   date-time: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 
 public-ai:
-  base-url: http://localhost:11434
-  model: llama3.2
+  cloudflare:
+    account-id: bccbe013de4159db55636a772d180bba
+    api-token: sfFoierAdCQ1G2RoN6JUKHoYgw5CqXm7W9PyvSct
+    model: "@cf/meta/llama-3.1-8b-instruct"
   timeout-seconds: 60

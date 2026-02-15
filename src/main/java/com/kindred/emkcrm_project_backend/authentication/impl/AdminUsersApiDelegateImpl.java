@@ -1,10 +1,10 @@
 package com.kindred.emkcrm_project_backend.authentication.impl;
 
-import com.kindred.emkcrm.api.AdminUsersApiDelegate;
-import com.kindred.emkcrm.model.AdminCreateUserRequest;
-import com.kindred.emkcrm.model.AdminResetPasswordRequest;
-import com.kindred.emkcrm.model.AdminUserDto;
-import com.kindred.emkcrm.model.MessageResponse;
+import com.kindred.emkcrm_project_backend.api.AdminUsersApiDelegate;
+import com.kindred.emkcrm_project_backend.model.AdminCreateUserRequest;
+import com.kindred.emkcrm_project_backend.model.AdminResetPasswordRequest;
+import com.kindred.emkcrm_project_backend.model.AdminUserDto;
+import com.kindred.emkcrm_project_backend.model.MessageResponse;
 import com.kindred.emkcrm_project_backend.db.entities.Role;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;

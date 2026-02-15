@@ -1,7 +1,7 @@
 package com.kindred.emkcrm_project_backend.authentication.impl;
 
-import com.kindred.emkcrm.api.AuthApiDelegate;
-import com.kindred.emkcrm.model.*;
+import com.kindred.emkcrm_project_backend.api.AuthApiDelegate;
+import com.kindred.emkcrm_project_backend.model.*;
 import com.kindred.emkcrm_project_backend.authentication.JwtTokenProvider;
 import com.kindred.emkcrm_project_backend.authentication.UserService;
 import com.kindred.emkcrm_project_backend.db.entities.User;

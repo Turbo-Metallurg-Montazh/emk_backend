@@ -226,9 +226,9 @@
                             <generatorName>spring</generatorName>
                             <output>${project.build.directory}/generated-sources/openapi</output>
 
-                            <apiPackage>com.kindred.emkcrm.api</apiPackage>
-                            <modelPackage>com.kindred.emkcrm.model</modelPackage>
-                            <invokerPackage>com.kindred.emkcrm.invoker</invokerPackage>
+                            <apiPackage>com.kindred.emkcrm_project_backend.api</apiPackage>
+                            <modelPackage>com.kindred.emkcrm_project_backend.model</modelPackage>
+                            <invokerPackage>com.kindred.emkcrm_project_backend.invoker</invokerPackage>
 
                             <configOptions>
                                 <delegatePattern>true</delegatePattern>

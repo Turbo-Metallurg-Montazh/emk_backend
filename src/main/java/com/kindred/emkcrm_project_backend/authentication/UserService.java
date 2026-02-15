@@ -1,6 +1,6 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
-import com.kindred.emkcrm.model.LoginRequest;
+import com.kindred.emkcrm_project_backend.model.LoginRequest;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;

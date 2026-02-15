@@ -3,6 +3,7 @@ package com.kindred.emkcrm_project_backend.authentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,7 +33,7 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)  // Use the new way to disable CSRF
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfig.setAllowedOrigins(java.util.List.of("http://localhost:4200", "https://turbo-metallurg-montazh.ru"));
+                    corsConfig.setAllowedOrigins(java.util.List.of("http://localhost:5173", "https://turbo-metallurg-montazh.ru"));
                     corsConfig.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfig.setAllowedHeaders(java.util.List.of("*"));
                     corsConfig.setAllowCredentials(true);

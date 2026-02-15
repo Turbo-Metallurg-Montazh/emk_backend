@@ -1,19 +1,19 @@
 package com.kindred.emkcrm_project_backend.askai;
 
-import com.kindred.emkcrm.api.PublicAiApiDelegate;
-import com.kindred.emkcrm.model.PublicAiChatRequest;
-import com.kindred.emkcrm.model.PublicAiChatResponse;
+import com.kindred.emkcrm_project_backend.api.PublicAiApiDelegate;
+import com.kindred.emkcrm_project_backend.model.PublicAiChatRequest;
+import com.kindred.emkcrm_project_backend.model.PublicAiChatResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 @Service
-public class PublicAIApiDelegateImpl implements PublicAiApiDelegate {
+public class PublicAiApiDelegateImpl implements PublicAiApiDelegate {
 
     private final PublicAiProxyService proxyService;
 
-    public PublicAIApiDelegateImpl(PublicAiProxyService proxyService) {
+    public PublicAiApiDelegateImpl(PublicAiProxyService proxyService) {
         this.proxyService = proxyService;
     }
 

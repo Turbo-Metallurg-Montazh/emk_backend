@@ -19,14 +19,16 @@ public class Role {
     private Long id;
     @Column(unique = true)
     private String name;
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "roles")
 
     @JsonIgnore
     private Set<User> users;
+
     @Override
     public String toString() {
         return String.format("Role{id=%d, name='%s'}", id, name);
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, name);

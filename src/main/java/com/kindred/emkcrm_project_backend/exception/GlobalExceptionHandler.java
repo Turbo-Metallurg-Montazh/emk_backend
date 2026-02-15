@@ -1,6 +1,6 @@
 package com.kindred.emkcrm_project_backend.exception;
 
-import com.kindred.emkcrm.model.ErrorResponse;
+import com.kindred.emkcrm_project_backend.model.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
