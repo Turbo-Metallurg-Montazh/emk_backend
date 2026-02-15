@@ -32,7 +32,7 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)  // Use the new way to disable CSRF
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfig.setAllowedOrigins(java.util.List.of("http://localhost:4200"));
+                    corsConfig.setAllowedOrigins(java.util.List.of("http://localhost:4200", "https://turbo-metallurg-montazh.ru"));
                     corsConfig.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     corsConfig.setAllowedHeaders(java.util.List.of("*"));
                     corsConfig.setAllowCredentials(true);
@@ -41,7 +41,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints for Kubernetes probes
-                                .requestMatchers("/register", "/login/username", "/activate", "/send-activation", "/download", "/ask").permitAll() // Allow these URLs
+                                .requestMatchers("/register", "/login/username", "/activate", "/send-activation", "/download", "/ask", "/public-ai/").permitAll() // Allow these URLs
                                 .anyRequest().authenticated() // All other requests need to be authenticated
                 )
                 .sessionManagement(session -> session
