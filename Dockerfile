@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Кэш зависимостей (максимально эффективно)
 COPY pom.xml .
+COPY .openapi-generator-ignore .
 RUN mvn -B -q dependency:go-offline
 
 # Копируем исходники и собираем JAR
