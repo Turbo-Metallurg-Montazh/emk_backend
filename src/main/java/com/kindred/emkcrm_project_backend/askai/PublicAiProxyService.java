@@ -11,11 +11,12 @@ import org.springframework.web.client.RestClient;
 
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.BAD_GATEWAY;
 
@@ -52,30 +53,27 @@ public class PublicAiProxyService {
     }
 
     public String ask(PublicAiChatRequest req) {
-        // Собираем “сообщения” в один промпт (самый простой и надёжный формат для CF)
-        String prompt = buildPrompt(req);
+        List<CfMessage> messages = buildMessages(req);
 
-        // Workers AI ожидает JSON вида { "prompt": "..." } для многих text-generation моделей
-        Map<String, Object> payload = Map.of(
-                "prompt", prompt
-                // опционально можно добавить параметры генерации:
-                // ,"max_tokens", 512
-                // ,"temperature", 0.4
-        );
+        CfChatRequest payload = new CfChatRequest(messages);
 
         try {
-            CloudflareAiResponse raw = restClient.post()
+            CfChatResponse raw = restClient.post()
                     .uri("/" + model)
                     .body(payload)
                     .retrieve()
-                    .body(CloudflareAiResponse.class);
+                    .body(CfChatResponse.class);
 
-            if (raw == null || raw.result == null) return "";
-            // Обычно там result.response, но зависит от модели. Подстрахуемся:
-            if (raw.result.response != null) return raw.result.response;
-            if (raw.result.text != null) return raw.result.text;
+            if (raw == null ||
+                    raw.result() == null ||
+                    raw.result().choices() == null ||
+                    raw.result().choices().isEmpty() ||
+                    raw.result().choices().getFirst().message() == null) {
+                return "";
+            }
 
-            return "";
+            return raw.result().choices().getFirst().message().content();
+
         } catch (Exception e) {
             throw new ResponseStatusException(
                     BAD_GATEWAY,
@@ -85,35 +83,24 @@ public class PublicAiProxyService {
         }
     }
 
-    private String buildPrompt(PublicAiChatRequest req) {
-        StringBuilder sb = new StringBuilder();
+    private List<CfMessage> buildMessages(PublicAiChatRequest req) {
+        List<CfMessage> messages = new ArrayList<>();
 
+        // system
         if (req.getSystemPrompt() != null && !req.getSystemPrompt().isBlank()) {
-            sb.append("System: ").append(req.getSystemPrompt().trim()).append("\n\n");
+            messages.add(new CfMessage("system", req.getSystemPrompt().trim()));
         }
 
+        // history
         if (req.getHistory() != null) {
             for (PublicAiChatMessage m : req.getHistory()) {
-                sb.append(m.getRole().getValue()).append(": ").append(m.getContent()).append("\n");
+                messages.add(new CfMessage(m.getRole().getValue(), m.getContent()));
             }
-            sb.append("\n");
         }
 
-        sb.append("user: ").append(req.getMessage()).append("\n");
-        sb.append("assistant: ");
+        // user
+        messages.add(new CfMessage("user", req.getMessage()));
 
-        return sb.toString();
-    }
-
-    // ---- DTO под Cloudflare ----
-    public static final class CloudflareAiResponse {
-        public boolean success;
-        public CloudflareAiResult result;
-    }
-
-    public static final class CloudflareAiResult {
-        // встречающиеся поля (зависит от модели/эндпойнта)
-        public String response;
-        public String text;
+        return messages;
     }
 }
