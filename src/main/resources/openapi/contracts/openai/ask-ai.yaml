@@ -1,0 +1,31 @@
+ask-open-ai:
+  post:
+    tags: [PublicAI]
+    summary: Ask public AI
+    operationId: publicAiChat
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            title: PublicAiChatRequest
+            allOf:
+              - $ref: "../../models/ask-ai.yaml#/components/schemas/PublicAiChatRequest"
+    responses:
+      '200':
+        description: Success
+        content:
+          application/json:
+            schema:
+              title: PublicAiChat200Response
+              allOf:
+                - $ref: "../../models/ask-ai.yaml#/components/schemas/PublicAiChatResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              title: PublicAiChat501Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"

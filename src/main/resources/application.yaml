@@ -101,3 +101,8 @@ schedule:
 
 format:
   date-time: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+
+public-ai:
+  base-url: http://localhost:11434
+  model: llama3.2
+  timeout-seconds: 60

@@ -40,3 +40,6 @@ paths:
 
   /admin/users/{username}/reset-password:
     $ref: "./contracts/auth/admin-users.yaml#/adminUserResetPassword"
+
+  /public-ai/chat:
+    $ref: "./contracts/openai/ask-ai.yaml#/ask-open-ai"

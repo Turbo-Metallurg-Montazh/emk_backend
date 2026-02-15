@@ -1,0 +1,30 @@
+components:
+  schemas:
+    PublicAiChatRequest:
+      type: object
+      required: [message]
+      properties:
+        systemPrompt:
+          type: string
+        message:
+          type: string
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicAiChatMessage"
+    PublicAiChatMessage:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+    PublicAiChatResponse:
+      type: object
+      required: [answer]
+      properties:
+        answer:
+          type: string
+  
