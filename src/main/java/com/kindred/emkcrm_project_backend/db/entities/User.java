@@ -1,28 +1,37 @@
 package com.kindred.emkcrm_project_backend.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "user_info")
-public class User {
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(exclude = "roles")
+public class User extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
+    @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "username", unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
-    @Column(unique = true)
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "password", nullable = false)
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -32,18 +41,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonIgnore
-    private Set<Role> roles;
-    @Override
-    public String toString() {
-        return String.format("User{id=%d, username='%s', email='%s', password='%s'}", id, username, email, password);
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, username, email, password);
-    }
+    private Set<Role> roles = new HashSet<>();
+
     public void addRoles(Role role) {
         roles.add(role);
     }
+
     public void removeRoles(Role role) {
         roles.remove(role);
     }

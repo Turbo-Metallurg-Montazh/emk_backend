@@ -1,19 +1,35 @@
 package com.kindred.emkcrm_project_backend.db.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-
-import java.time.LocalDateTime;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "illiquid_assets")
-
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-public class IlliquidAssets {
-    IlliquidAssets(String commodityMaterialValue, String articleNumber, float quantity, String unitsOfMeasurement, float price, String currency, String arrivalDate, String responsibleEmployee, long createdById, String commentary, String avito, String assetType, String assetStatus) {
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString
+public class IlliquidAssets extends AuditableEntity {
+    public IlliquidAssets(
+            String commodityMaterialValue,
+            String articleNumber,
+            float quantity,
+            String unitsOfMeasurement,
+            float price,
+            String currency,
+            String arrivalDate,
+            String responsibleEmployee,
+            long createdById,
+            String commentary,
+            String avito,
+            String assetType,
+            String assetStatus
+    ) {
         this.commodityMaterialValue = commodityMaterialValue;
         this.articleNumber = articleNumber;
         this.quantity = quantity;
@@ -28,13 +44,12 @@ public class IlliquidAssets {
         this.avito = avito;
         this.assetType = assetType;
         this.assetStatus = assetStatus;
-        this.creatingDate = LocalDateTime.now();
-
     }
 
     @Id
     @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "commodity_material_value", nullable = false)
@@ -61,12 +76,6 @@ public class IlliquidAssets {
     @Column(name = "arrival_date", nullable = false)
     private String arrivalDate;
 
-    @Column(name = "creating_date", nullable = false)
-    private LocalDateTime creatingDate;
-
-    @Column(name = "last_update_date")
-    private LocalDateTime lastUpdateDate;
-
     @Column(name = "responsible_employee")
     private String responsibleEmployee;
 
@@ -85,4 +94,9 @@ public class IlliquidAssets {
     @Column(name = "asset_status", nullable = false)
     private String assetStatus;
 
+    @PrePersist
+    @PreUpdate
+    public void recalculateSummaryPrice() {
+        this.summaryPrice = this.price * this.quantity;
+    }
 }

@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record KonturApiProperties(
         String apiKeyHeader,
         String apiKey,
-        String getTenderInfoUrl,
-        String findTendersUrl
+        String baseUrl
 ) {
 }

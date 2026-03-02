@@ -1,34 +1,36 @@
 package com.kindred.emkcrm_project_backend.utils;
 
-import com.kindred.emkcrm_project_backend.config.KonturApiProperties;
-import com.kindred.emkcrm_project_backend.entities.tenderEntity.Tender;
-import com.kindred.emkcrm_project_backend.utils.deserializers_JSON.TenderDeserializer;
+import com.kindred.emkcrm_project_backend.db.entities.tenderEntity.Tender;
+import com.kindred.emkcrm_project_backend.exception.BadRequestException;
+import com.kindred.emkcrm_project_backend.exception.ServiceUnavailableException;
+import com.kindred.emkcrm_project_backend.external.KonturExternalApiService;
+import com.kindred.emkcrm_project_backend.utils.json.TenderJsonMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class GetTender {
 
-    private final KonturApiProperties konturApiProperties;
+    private final KonturExternalApiService konturExternalApiService;
+    private final TenderJsonMapper tenderJsonMapper;
 
     public GetTender(
-            KonturApiProperties konturApiProperties
+            KonturExternalApiService konturExternalApiService,
+            TenderJsonMapper tenderJsonMapper
     ) {
-        this.konturApiProperties = konturApiProperties;
+        this.konturExternalApiService = konturExternalApiService;
+        this.tenderJsonMapper = tenderJsonMapper;
     }
-    public Tender getTenderInfo(String id) throws JsonProcessingException {
-        String url = String.format("%s%s?", konturApiProperties.getTenderInfoUrl(), id);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(konturApiProperties.apiKeyHeader(), konturApiProperties.apiKey());
-        HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-        return TenderDeserializer.deserialize(response.getBody());
+    public Tender getTenderInfo(String id) throws JsonProcessingException {
+        if (id == null || id.isBlank()) {
+            throw new BadRequestException("Tender id must not be blank");
+        }
+        ResponseEntity<String> response = konturExternalApiService.getPurchaseByIdRaw(id);
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null || response.getBody().isBlank()) {
+            throw new ServiceUnavailableException("Failed to get purchase details from external service");
+        }
+        return tenderJsonMapper.readTender(response.getBody());
     }
 }

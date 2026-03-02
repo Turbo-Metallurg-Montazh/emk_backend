@@ -28,7 +28,7 @@ public class UserDetail implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+    public @NonNull UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         com.kindred.emkcrm_project_backend.db.entities.User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);

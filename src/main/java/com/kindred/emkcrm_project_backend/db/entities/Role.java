@@ -2,35 +2,33 @@ package com.kindred.emkcrm_project_backend.db.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
 @Table(name = "roles")
+@Getter
+@Setter
 @NoArgsConstructor
-public class Role {
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
+@ToString(exclude = "users")
+public class Role extends AuditableEntity {
     @Id
     @Column(name = "role_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
-    @Column(unique = true)
+
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
+
     @ManyToMany(mappedBy = "roles")
-
     @JsonIgnore
-    private Set<User> users;
-
-    @Override
-    public String toString() {
-        return String.format("Role{id=%d, name='%s'}", id, name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
+    private Set<User> users = new HashSet<>();
 }

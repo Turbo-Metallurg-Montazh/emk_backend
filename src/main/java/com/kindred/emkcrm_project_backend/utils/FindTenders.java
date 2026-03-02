@@ -1,91 +1,109 @@
 package com.kindred.emkcrm_project_backend.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.kindred.emkcrm_project_backend.config.KonturApiProperties;
 import com.kindred.emkcrm_project_backend.config.PaginationProperties;
 import com.kindred.emkcrm_project_backend.db.repositories.FoundTenderRepository;
-import com.kindred.emkcrm_project_backend.entities.foundTendersEntity.FoundTender;
-import com.kindred.emkcrm_project_backend.entities.foundTendersEntity.FoundTenders;
-import com.kindred.emkcrm_project_backend.entities.foundTendersEntity.FoundTendersArray;
-import com.kindred.emkcrm_project_backend.utils.deserializers_JSON.FoundTendersDeserializer;
-import com.kindred.emkcrm_project_backend.utils.serializers_JSON.FindTendersJsonModifier;
-import org.springframework.http.*;
+import com.kindred.emkcrm_project_backend.db.entities.foundTendersEntity.FoundTender;
+import com.kindred.emkcrm_project_backend.db.entities.foundTendersEntity.FoundTenders;
+import com.kindred.emkcrm_project_backend.db.entities.foundTendersEntity.FoundTendersArray;
+import com.kindred.emkcrm_project_backend.exception.BadRequestException;
+import com.kindred.emkcrm_project_backend.exception.ServiceUnavailableException;
+import com.kindred.emkcrm_project_backend.external.KonturExternalApiService;
+import com.kindred.emkcrm_project_backend.utils.json.TenderJsonMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 
 
+@Slf4j
 @Component
 public class FindTenders {
     private final FoundTenderRepository foundTenderRepository;
     private final PaginationProperties paginationProperties;
-    private final KonturApiProperties konturApiProperties;
+    private final KonturExternalApiService konturExternalApiService;
+    private final TenderJsonMapper tenderJsonMapper;
+
     public FindTenders(
             FoundTenderRepository foundTenderRepository,
             PaginationProperties paginationProperties,
-            KonturApiProperties konturApiProperties
+            KonturExternalApiService konturExternalApiService,
+            TenderJsonMapper tenderJsonMapper
     ) {
         this.foundTenderRepository = foundTenderRepository;
         this.paginationProperties = paginationProperties;
-        this.konturApiProperties = konturApiProperties;
+        this.konturExternalApiService = konturExternalApiService;
+        this.tenderJsonMapper = tenderJsonMapper;
     }
 
 
-    //public FoundTendersArray findTenders(ArrayList<String> text, Boolean strictSearch, Boolean attachments, ArrayList<String> exclude, ArrayList<String> regionIds, ArrayList<Integer> categoryIds, ArrayList<Integer> purchaseStatuses, ArrayList<Integer> laws, ArrayList<String> includeInns, ArrayList<String> excludeInns, ArrayList<Integer> procedures, ArrayList<Integer> electronicPlaces, Integer maxPriceFrom, Integer maxPriceTo, Boolean maxPriceNone, Boolean advance44, Boolean advance223, Integer smp, String dateFromInstant, String dateToInstant, int fromPage, int toPage) throws JsonProcessingException {
     public FoundTendersArray findTenders(String jsonFilter, String dateFromInstant, String dateToInstant, int fromPage, int toPage) throws JsonProcessingException {
+        validatePages(fromPage, toPage);
+        Date fromDate = parseInstant(dateFromInstant, "dateFromInstant");
+        Date toDate = parseInstant(dateToInstant, "dateToInstant");
 
+        int firstPageIndex = fromPage - 1;
+        String firstPageRequest = tenderJsonMapper.patchSearchPayload(jsonFilter, dateFromInstant, dateToInstant, firstPageIndex);
+        String firstResponse = searchPurchases(firstPageRequest);
 
-        System.out.println("findTenders");
-        fromPage--;
-        RestTemplate restTemplate = new RestTemplate();
+        FoundTenders foundTenders = tenderJsonMapper.readFoundTenders(firstResponse);
+        ArrayList<FoundTender> collectedTenders = safeTenders(foundTenders);
 
-        // Заголовки запроса
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(konturApiProperties.apiKeyHeader(), konturApiProperties.apiKey());
+        int totalPages = Math.max(0, (int) Math.ceil((double) foundTenders.getTotalCount() / paginationProperties.items_on_page()));
+        int maxPageIndex = Math.max(firstPageIndex, totalPages - 1);
+        int lastPageIndex = Math.min(toPage - 1, maxPageIndex);
 
-        Instant instant = Instant.parse(dateFromInstant);
-        Date fromDate = Date.from(instant);
-
-        instant = Instant.parse(dateToInstant);
-        Date toDate = Date.from(instant);
-
-        //FindTendersPost findTendersPost = new FindTendersPost(text, strictSearch, attachments, exclude, regionIds, categoryIds, purchaseStatuses, laws, includeInns, excludeInns, procedures, electronicPlaces, maxPriceFrom, maxPriceTo, maxPriceNone, advance44, advance223, smp, dateFromInstant, dateToInstant, fromPage);
-        // Создание объекта HttpEntity с заголовками и данными
-        HttpEntity<String> requestEntity = new HttpEntity<>(FindTendersJsonModifier.findTendersJson(jsonFilter, dateFromInstant, dateToInstant, fromPage), headers);
-
-        System.out.println(requestEntity.getBody());
-        // Отправка POST-запроса и получение ответа
-        String response = restTemplate.postForObject(konturApiProperties.findTendersUrl(), requestEntity, String.class);
-        System.out.println(response);
-        FoundTendersArray foundTendersArray = new FoundTendersArray();
-        FoundTenders foundTenders = FoundTendersDeserializer.deserialize(response);
-
-        ArrayList<FoundTender> foundTenderArrayList = foundTenders.getFoundTenders();
-        fromPage++;
-        for (; fromPage <= (foundTenders.getTotalCount() / paginationProperties.items_on_page()) && fromPage < toPage; fromPage++) {
-
-            // Создание объекта HttpEntity с заголовками и данными
-            requestEntity = new HttpEntity<>(FindTendersJsonModifier.findTendersJson(jsonFilter, dateFromInstant, dateToInstant, fromPage), headers);
-
-
-            // Отправка POST-запроса и получение ответа
-            response = restTemplate.postForObject(konturApiProperties.getTenderInfoUrl(), requestEntity, String.class);
-            System.out.println(response);
-            foundTenderArrayList.addAll(FoundTendersDeserializer.deserialize(response).getFoundTenders());
+        for (int pageIndex = firstPageIndex + 1; pageIndex <= lastPageIndex; pageIndex++) {
+            String nextPageRequest = tenderJsonMapper.patchSearchPayload(jsonFilter, dateFromInstant, dateToInstant, pageIndex);
+            String nextResponse = searchPurchases(nextPageRequest);
+            collectedTenders.addAll(safeTenders(tenderJsonMapper.readFoundTenders(nextResponse)));
         }
-        foundTenders.setFoundTenders(foundTenderArrayList);
+
+        foundTenders.setFoundTenders(collectedTenders);
+
+        FoundTendersArray foundTendersArray = new FoundTendersArray();
         foundTendersArray.setFoundTenders(foundTenders);
-        foundTendersArray.setTendersDownloadCount(foundTendersArray.getFoundTenders().getFoundTenders().size());
+        foundTendersArray.setTendersDownloadCount(collectedTenders.size());
         foundTendersArray.setFromDate(fromDate);
         foundTendersArray.setToDate(toDate);
-        foundTendersArray.setTotalPagesCount(foundTenders.getTotalCount());
+        foundTendersArray.setTotalPagesCount(foundTenders.getTotalCount(), paginationProperties.items_on_page());
 
-        foundTenderRepository.saveAll(foundTendersArray.getFoundTenders().getFoundTenders());
+        foundTenderRepository.saveAll(collectedTenders);
+        log.info("Loaded {} tenders from external API for period {} - {}", collectedTenders.size(), dateFromInstant, dateToInstant);
+
         return foundTendersArray;
     }
 
+    private String searchPurchases(String payload) {
+        ResponseEntity<String> responseEntity = konturExternalApiService.searchPurchasesRaw(payload);
+        if (!responseEntity.getStatusCode().is2xxSuccessful() || responseEntity.getBody() == null || responseEntity.getBody().isBlank()) {
+            throw new ServiceUnavailableException("Failed to search purchases in external service");
+        }
+        return responseEntity.getBody();
+    }
+
+    private ArrayList<FoundTender> safeTenders(FoundTenders foundTenders) {
+        return foundTenders.getFoundTenders() == null ? new ArrayList<>() : new ArrayList<>(foundTenders.getFoundTenders());
+    }
+
+    private Date parseInstant(String instantString, String fieldName) {
+        try {
+            Instant instant = Instant.parse(instantString);
+            return Date.from(instant);
+        } catch (RuntimeException e) {
+            throw new BadRequestException("Invalid instant in " + fieldName);
+        }
+    }
+
+    private void validatePages(int fromPage, int toPage) {
+        if (fromPage < 1) {
+            throw new BadRequestException("fromPage must be >= 1");
+        }
+        if (toPage < fromPage) {
+            throw new BadRequestException("toPage must be >= fromPage");
+        }
+    }
 }

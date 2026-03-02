@@ -1,12 +1,11 @@
 package com.kindred.emkcrm_project_backend.askai;
 
 import com.kindred.emkcrm_project_backend.api.PublicAiApiDelegate;
+import com.kindred.emkcrm_project_backend.exception.BadRequestException;
 import com.kindred.emkcrm_project_backend.model.PublicAiChatRequest;
 import com.kindred.emkcrm_project_backend.model.PublicAiChatResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 public class PublicAiApiDelegateImpl implements PublicAiApiDelegate {
@@ -19,10 +18,10 @@ public class PublicAiApiDelegateImpl implements PublicAiApiDelegate {
 
     @Override
     public ResponseEntity<PublicAiChatResponse> publicAiChat(PublicAiChatRequest request) {
-        Objects.requireNonNull(request, "request must not be null");
+        if (request == null) {
+            throw new BadRequestException("request must not be null");
+        }
         String answer = proxyService.ask(request);
-        PublicAiChatResponse resp = new PublicAiChatResponse();
-        resp.setAnswer(answer);
-        return ResponseEntity.ok(resp);
+        return ResponseEntity.ok(new PublicAiChatResponse(answer));
     }
 }

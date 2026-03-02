@@ -31,10 +31,8 @@ public class UsernameGenerator {
             throw new IllegalArgumentException("First name and last name must not be empty");
         }
 
-        String baseUsername = first.charAt(0) + "." + last;
-
         // Если отчество отсутствует, сразу переходим к числовым суффиксам
-        String candidate = baseUsername;
+        String candidate = first.charAt(0) + "." + last;
         if (userRepository.findByUsername(candidate) == null) {
             return candidate;
         }
@@ -65,11 +63,10 @@ public class UsernameGenerator {
         if (source == null) {
             return "";
         }
-        Map<Character, String> map = CYRILLIC_MAP;
         StringBuilder sb = new StringBuilder();
         for (char ch : source.toCharArray()) {
             char lower = Character.toLowerCase(ch);
-            String repl = map.get(lower);
+            String repl = CYRILLIC_MAP.get(lower);
             if (repl != null) {
                 sb.append(repl);
             } else if (Character.isLetterOrDigit(ch)) {

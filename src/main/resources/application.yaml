@@ -36,8 +36,8 @@ spring:
   mail:
     host: smtp.mail.ru
     port: 465
-    username: assistantpro.service@mail.ru
-    password: S7gfSwhJXYC79jqEWVHs
+    username: ${SPRING_MAIL_USERNAME:no-reply@example.com}
+    password: ${SPRING_MAIL_PASSWORD:change-me}
     protocol: smtps
     properties:
       mail:
@@ -55,7 +55,7 @@ springdoc:
 security:
   jwt:
     token:
-      secret-key: vuekhbfkfdjhvsbavdkjfhdbavhfkjbvgtdfhjghdxdnljfdhbafjkabvfshjdc
+      secret-key: ${SECURITY_JWT_TOKEN_SECRET_KEY:change-me-change-me-change-me-change-me}
       expire-length: 3600000 # 1 hour
 
 logging:
@@ -82,18 +82,17 @@ management:
 external-api:
   kontur:
     api-key-header: X-Kontur-Apikey
-    api-key: 8759e5bf-ecbc-1a25-381d-6b94fecc09e5
-    get-tender-info-url: https://api-zakupki.kontur.ru/external/v1/purchases/
-    find-tenders-url: https://api-zakupki.kontur.ru/external/v1/search?
+    api-key: ${KONTUR_API_KEY:change-me}
+    base-url: https://api-zakupki.kontur.ru
 
 email:
   domain: mail.com
   activation-link: http://localhost:8080/api/activate?token=
-  host-email: assistantpro.service@mail.ru
+  host-email: ${EMAIL_HOST:no-reply@example.com}
   login-url: https://turbo-metallurg-montazh.ru/login
 
 activation:
-  key: egdfvhfbnqergjgkwoerigjsnfsoflkvnslfg # must be >32 chars
+  key: ${ACTIVATION_KEY:change-me-change-me-change-me-change-me} # must be >32 chars
   expiration-ms: 8640000   # 360000 * 24
 
 pagination:
@@ -107,7 +106,7 @@ format:
 
 public-ai:
   cloudflare:
-    account-id: bccbe013de4159db55636a772d180bba
-    api-token: sfFoierAdCQ1G2RoN6JUKHoYgw5CqXm7W9PyvSct
-    model: "@cf/openai/gpt-oss-120b"
+    account-id: ${PUBLIC_AI_CF_ACCOUNT_ID:local-account-id}
+    api-token: ${PUBLIC_AI_CF_API_TOKEN:local-api-token}
+    model: ${PUBLIC_AI_CF_MODEL:@cf/openai/gpt-oss-120b}
   timeout-seconds: 60

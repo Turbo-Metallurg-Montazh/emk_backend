@@ -3,7 +3,6 @@ package com.kindred.emkcrm_project_backend.authentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,7 +40,7 @@ public class SecurityConfig{
                 }))
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/actuator/**").permitAll() // Allow actuator endpoints for Kubernetes probes
+                                .requestMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
                                 .requestMatchers("/register", "/login/username", "/activate", "/send-activation", "/download", "/ask", "/public-ai/**").permitAll() // Allow these URLs
                                 .anyRequest().authenticated() // All other requests need to be authenticated
                 )

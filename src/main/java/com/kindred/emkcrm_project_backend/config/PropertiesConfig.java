@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
         EmailProperties.class,
         KonturApiProperties.class,
         PaginationProperties.class,
-        FormatProperties.class
+        FormatProperties.class,
+        PublicAiProperties.class
 })
 public class PropertiesConfig {}
