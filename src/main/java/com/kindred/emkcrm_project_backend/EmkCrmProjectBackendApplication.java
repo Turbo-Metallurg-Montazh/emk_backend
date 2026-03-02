@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @SpringBootApplication
 @EnableScheduling
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
-@PreAuthorize("hasRole('USER')")
+@PreAuthorize("hasAuthority('TENDER_FILTER.WRITE')")
 public class EmkCrmProjectBackendApplication {
 
     private final AddTenderFilter addTenderFilter;

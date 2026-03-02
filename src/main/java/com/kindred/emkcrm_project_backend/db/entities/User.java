@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Table(name = "user_info")
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-@ToString(exclude = "roles")
+@ToString(exclude = {"roles", "groups"})
 public class User extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,12 +36,24 @@ public class User extends AuditableEntity {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_roles",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonIgnore
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_group_member",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_group_id")
+    )
+    @JsonIgnore
+    private Set<UserGroup> groups = new HashSet<>();
+
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled = true;
 
     public void addRoles(Role role) {
         roles.add(role);

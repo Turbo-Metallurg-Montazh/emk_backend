@@ -74,3 +74,45 @@ components:
         newPassword:
           type: string
       required: [newPassword]
+
+    PermissionDto:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required: [code]
+
+    RoleDto:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        system:
+          type: boolean
+        permissions:
+          type: array
+          items:
+            type: string
+      required: [code, name, system, permissions]
+
+    UpdateRolePermissionsRequest:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+      required: [permissions]
+
+    UpdateUserRolesRequest:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            type: string
+      required: [roles]

@@ -1,0 +1,127 @@
+adminRoles:
+  get:
+    tags: [RbacAdmin]
+    summary: List roles with permissions
+    operationId: listRolesWithPermissions
+    responses:
+      '200':
+        description: Roles list
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "../../models/auth.yaml#/components/schemas/RoleDto"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+adminPermissions:
+  get:
+    tags: [RbacAdmin]
+    summary: List permission catalog
+    operationId: listPermissions
+    responses:
+      '200':
+        description: Permission catalog
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "../../models/auth.yaml#/components/schemas/PermissionDto"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+adminRolePermissions:
+  put:
+    tags: [RbacAdmin]
+    summary: Replace role permissions
+    operationId: updateRolePermissions
+    parameters:
+      - in: path
+        name: roleCode
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../models/auth.yaml#/components/schemas/UpdateRolePermissionsRequest"
+    responses:
+      '200':
+        description: Updated role
+        content:
+          application/json:
+            schema:
+              $ref: "../../models/auth.yaml#/components/schemas/RoleDto"
+
+      '404':
+        description: Role or permission not found
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
+
+adminUserRoles:
+  put:
+    tags: [RbacAdmin]
+    summary: Replace user roles
+    operationId: updateUserRoles
+    parameters:
+      - in: path
+        name: username
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../models/auth.yaml#/components/schemas/UpdateUserRolesRequest"
+    responses:
+      '200':
+        description: Updated user
+        content:
+          application/json:
+            schema:
+              $ref: "../../models/auth.yaml#/components/schemas/AdminUserDto"
+
+      '404':
+        description: User or role not found
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '501':
+        description: Not implemented
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"

@@ -1,6 +1,6 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
-import com.kindred.emkcrm_project_backend.db.repositories.RoleRepository;
+import com.kindred.emkcrm_project_backend.authentication.rbac.RbacService;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
 import org.jspecify.annotations.NonNull;
 
@@ -13,18 +13,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
 public class UserDetail implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final RbacService rbacService;
 
-    public UserDetail(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserDetail(UserRepository userRepository, RbacService rbacService) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.rbacService = rbacService;
     }
 
     @Override
@@ -33,10 +33,18 @@ public class UserDetail implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
-        user.setRoles(roleRepository.findByUsers(Set.of(user)));
-        Set<GrantedAuthority> grantedAuthorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(String.format("ROLE_%s", role.getName())))
+        Collection<GrantedAuthority> grantedAuthorities = rbacService.resolveAuthorities(username).stream()
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
-        return new User(user.getUsername(), user.getPassword(), true, true, true, true, grantedAuthorities);
+
+        return new User(
+                user.getUsername(),
+                user.getPassword(),
+                user.isEnabled(),
+                true,
+                true,
+                true,
+                grantedAuthorities
+        );
     }
 }

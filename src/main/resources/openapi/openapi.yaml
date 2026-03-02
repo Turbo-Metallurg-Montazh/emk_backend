@@ -12,25 +12,6 @@ paths:
   /login/username:
     $ref: "./contracts/auth/login.yaml#/loginByUsername"
 
-  # Ролевые эндпоинты для проверки прав доступа внутри CRM
-  /admin:
-    $ref: "./contracts/auth/roles.yaml#/admin"
-
-  /user:
-    $ref: "./contracts/auth/roles.yaml#/user"
-
-  /owner:
-    $ref: "./contracts/auth/roles.yaml#/owner"
-
-  /add-administrator-role:
-    $ref: "./contracts/auth/roles.yaml#/addAdmin"
-
-  /remove-administrator-role:
-    $ref: "./contracts/auth/roles.yaml#/removeAdmin"
-
-  /delete-user:
-    $ref: "./contracts/auth/roles.yaml#/deleteUser"
-
   # Эндпоинты панели администратора для управления пользователями
   /admin/users:
     $ref: "./contracts/auth/admin-users.yaml#/adminUsers"
@@ -40,6 +21,18 @@ paths:
 
   /admin/users/{username}/reset-password:
     $ref: "./contracts/auth/admin-users.yaml#/adminUserResetPassword"
+
+  /admin/roles:
+    $ref: "./contracts/auth/rbac-admin.yaml#/adminRoles"
+
+  /admin/permissions:
+    $ref: "./contracts/auth/rbac-admin.yaml#/adminPermissions"
+
+  /admin/roles/{roleCode}/permissions:
+    $ref: "./contracts/auth/rbac-admin.yaml#/adminRolePermissions"
+
+  /admin/users/{username}/roles:
+    $ref: "./contracts/auth/rbac-admin.yaml#/adminUserRoles"
 
   /public-ai/chat:
     $ref: "./contracts/openai/ask-ai.yaml#/ask-open-ai"

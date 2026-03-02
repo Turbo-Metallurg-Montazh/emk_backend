@@ -37,6 +37,7 @@
         <springdoc.version>3.0.0</springdoc.version>
         <jackson.version>0.2.8</jackson.version>
         <micrometer.version>1.16.1</micrometer.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
     </properties>
 
     <dependencies>
@@ -178,6 +179,11 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
             <version>${jakarta.mail.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
