@@ -12,8 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class RoleAdministrationService {
@@ -59,11 +61,16 @@ public class RoleAdministrationService {
                 .map(Role::getCode)
                 .sorted()
                 .collect(Collectors.toList());
+        String fullName = buildFullName(user.getLastName(), user.getFirstName(), user.getMiddleName());
 
         return new AdminUserDto()
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .roles(roleCodes);
+                .roles(roleCodes)
+                .firstName(user.getFirstName())
+                .middleName(user.getMiddleName())
+                .lastName(user.getLastName())
+                .fullName(fullName);
     }
 
     private User requireUser(String username) {
@@ -72,5 +79,14 @@ public class RoleAdministrationService {
             throw new NotFoundException("User not found");
         }
         return user;
+    }
+
+    private String buildFullName(String lastName, String firstName, String middleName) {
+        String fullName = Stream.of(lastName, firstName, middleName)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(part -> !part.isEmpty())
+                .collect(Collectors.joining(" "));
+        return fullName.isEmpty() ? null : fullName;
     }
 }
