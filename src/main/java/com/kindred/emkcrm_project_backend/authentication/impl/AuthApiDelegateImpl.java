@@ -24,7 +24,7 @@ public class AuthApiDelegateImpl implements AuthApiDelegate {
     }
 
     @Override
-    public ResponseEntity<TokenResponse> loginByUsername(LoginRequest loginRequest) {
+    public ResponseEntity<TokenResponse> login(LoginRequest loginRequest) {
         User user = userService.validateUsername(loginRequest);
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setToken(jwtTokenProvider.generateToken(user.getUsername()));
@@ -32,4 +32,3 @@ public class AuthApiDelegateImpl implements AuthApiDelegate {
     }
 
 }
-

@@ -78,7 +78,7 @@ export SPRING_DATASOURCE_PASSWORD=postgres
 
 Публичные:
 
-- `POST /login/username` - логин по username/password, возвращает JWT
+- `POST /login` - логин по username/email + password, возвращает JWT
 - `POST /public-ai/chat` - запрос к AI-провайдеру
 
 Защищенные (по ролям):
@@ -137,4 +137,3 @@ Ingress настроен на `api.turbo-metallurg-montazh.ru`.
 1. Удалите секреты из репозитория.
 2. Перенесите их в переменные окружения или Kubernetes Secrets.
 3. Ротуйте уже скомпрометированные ключи (JWT, SMTP, external API, AI token).
-

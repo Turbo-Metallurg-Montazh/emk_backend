@@ -1,10 +1,10 @@
 package com.kindred.emkcrm_project_backend.authentication;
 
-import com.kindred.emkcrm_project_backend.model.LoginRequest;
 import com.kindred.emkcrm_project_backend.authentication.rbac.RbacService;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
 import com.kindred.emkcrm_project_backend.exception.UnauthorizedException;
+import com.kindred.emkcrm_project_backend.model.LoginRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,7 @@ public class UserService {
 
 
     public User validateUsername(LoginRequest loginInfo) {
-        User user = findUserWithRolesByUsername(loginInfo.getUsername());
+        User user = findUserWithRolesByCredentials(loginInfo.getUsername(), loginInfo.getEmail());
         if (user != null && passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())){
             return user;
         }
@@ -44,5 +44,44 @@ public class UserService {
         }
         user.setRoles(rbacService.findRolesByUsername(username));
         return user;
+    }
+
+    public User findUserWithRolesByCredentials(String username, String email) {
+        User user = findByUsernameOrEmail(username, email);
+        if (user == null) {
+            return null;
+        }
+        user.setRoles(rbacService.findRolesByUsername(user.getUsername()));
+        return user;
+    }
+
+    private User findByUsernameOrEmail(String username, String email) {
+        String normalizedUsername = normalizeCredential(username);
+        String normalizedEmail = normalizeCredential(email);
+
+        if (normalizedUsername != null) {
+            User user = userRepository.findByUsername(normalizedUsername);
+            if (user != null) {
+                return user;
+            }
+        }
+
+        if (normalizedEmail != null) {
+            return userRepository.findByEmail(normalizedEmail);
+        }
+
+        if (normalizedUsername != null && normalizedUsername.contains("@")) {
+            return userRepository.findByEmail(normalizedUsername);
+        }
+
+        return null;
+    }
+
+    private String normalizeCredential(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

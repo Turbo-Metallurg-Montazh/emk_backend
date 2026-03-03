@@ -43,7 +43,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/actuator/health/**", "/actuator/info", "/actuator/prometheus").permitAll()
-                                .requestMatchers("/login/username").permitAll() // Allow these URLs
+                                .requestMatchers("/login").permitAll() // Allow these URLs
                                 .anyRequest().authenticated() // All other requests need to be authenticated
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

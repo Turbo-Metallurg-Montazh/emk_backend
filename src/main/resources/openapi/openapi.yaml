@@ -8,8 +8,8 @@ info:
 
 paths:
   # Аутентификация пользователя (корпоративная учетная запись)
-  /login/username:
-    $ref: "./contracts/auth/login.yaml#/loginByUsername"
+  /login:
+    $ref: "./contracts/auth/login.yaml#/login"
 
   # Эндпоинты панели администратора для управления пользователями
   /admin/users:
