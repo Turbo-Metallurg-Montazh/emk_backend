@@ -157,13 +157,12 @@ adminUserResetPassword:
     summary: Send password reset link
     description: Отправляет пользователю письмо со ссылкой для сброса пароля.
     operationId: resetUserPassword
-    parameters:
-      - in: path
-        name: email
-        required: true
-        schema:
-          type: string
-          format: email
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "../../models/auth.yaml#/components/schemas/SendPasswordResetLinkRequest"
     responses:
       '200':
         description: Password reset link sent
@@ -173,8 +172,24 @@ adminUserResetPassword:
               allOf:
                 - $ref: "../../models/auth.yaml#/components/schemas/MessageResponse"
 
+      '400':
+        description: Invalid request body
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
       '404':
         description: User not found
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
+      '503':
+        description: Failed to send email
         content:
           application/json:
             schema:

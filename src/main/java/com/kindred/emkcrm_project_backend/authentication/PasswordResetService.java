@@ -5,9 +5,11 @@ import com.kindred.emkcrm_project_backend.db.entities.PasswordResetToken;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.PasswordResetTokenRepository;
 import com.kindred.emkcrm_project_backend.exception.BadRequestException;
+import com.kindred.emkcrm_project_backend.exception.ServiceUnavailableException;
 import com.kindred.emkcrm_project_backend.services.email.EmailService;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,9 +60,9 @@ public class PasswordResetService {
         String resetUrl = buildResetUrl(rawToken);
         try {
             emailService.sendPasswordResetEmail(user.getEmail(), user.getUsername(), resetUrl);
-        } catch (MessagingException e) {
+        } catch (MessagingException | MailException e) {
             log.error("Failed to send password reset email to {}: {}", user.getEmail(), e.getMessage(), e);
-            throw new BadRequestException("Не удалось отправить письмо для сброса пароля");
+            throw new ServiceUnavailableException("Не удалось отправить письмо для сброса пароля");
         }
     }
 

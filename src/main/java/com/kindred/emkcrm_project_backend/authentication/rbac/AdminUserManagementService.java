@@ -12,6 +12,7 @@ import com.kindred.emkcrm_project_backend.exception.NotFoundException;
 import com.kindred.emkcrm_project_backend.model.AdminCreateUserRequest;
 import com.kindred.emkcrm_project_backend.model.AdminUserDto;
 import com.kindred.emkcrm_project_backend.model.MessageResponse;
+import com.kindred.emkcrm_project_backend.model.SendPasswordResetLinkRequest;
 import com.kindred.emkcrm_project_backend.model.UpdateUserEnabledRequest;
 import com.kindred.emkcrm_project_backend.services.email.EmailService;
 import com.kindred.emkcrm_project_backend.utils.PasswordGenerator;
@@ -163,8 +164,12 @@ public class AdminUserManagementService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('RBAC.USER.WRITE')")
-    public MessageResponse resetUserPassword(String email) {
+    public MessageResponse resetUserPassword(SendPasswordResetLinkRequest request) {
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new BadRequestException("email is required");
+        }
+
+        String email = request.getEmail().trim();
         User user = requireUserByEmail(email);
         passwordResetService.sendPasswordResetLink(user);
 

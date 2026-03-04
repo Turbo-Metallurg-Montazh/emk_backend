@@ -83,6 +83,14 @@ components:
             type: string
       required: [firstName, lastName, email]
 
+    SendPasswordResetLinkRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required: [email]
+
     PasswordResetConfirmRequest:
       type: object
       properties:
