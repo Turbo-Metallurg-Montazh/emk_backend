@@ -164,17 +164,25 @@ public class AdminUserManagementService {
 
     @Transactional
     @PreAuthorize("hasAuthority('RBAC.USER.WRITE')")
-    public MessageResponse resetUserPassword(String username) {
-        User user = requireUser(username);
+    public MessageResponse resetUserPassword(String email) {
+        User user = requireUserByEmail(email);
         passwordResetService.sendPasswordResetLink(user);
 
         MessageResponse response = new MessageResponse();
-        response.setMessage(String.format("Ссылка для сброса пароля отправлена пользователю %s", username));
+        response.setMessage(String.format("Ссылка для сброса пароля отправлена на %s", email));
         return response;
     }
 
     private User requireUser(String username) {
         User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new NotFoundException("User not found");
+        }
+        return user;
+    }
+
+    private User requireUserByEmail(String email) {
+        User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new NotFoundException("User not found");
         }

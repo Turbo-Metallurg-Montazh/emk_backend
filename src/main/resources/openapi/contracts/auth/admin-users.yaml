@@ -159,10 +159,11 @@ adminUserResetPassword:
     operationId: resetUserPassword
     parameters:
       - in: path
-        name: username
+        name: email
         required: true
         schema:
           type: string
+          format: email
     responses:
       '200':
         description: Password reset link sent

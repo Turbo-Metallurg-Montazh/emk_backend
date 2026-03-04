@@ -21,7 +21,7 @@ paths:
   /admin/users/{username}:
     $ref: "./contracts/auth/admin-users.yaml#/adminUserByUsername"
 
-  /admin/users/{username}/reset-password:
+  /admin/users/{email}/reset-password:
     $ref: "./contracts/auth/admin-users.yaml#/adminUserResetPassword"
 
   /admin/users/{username}/enabled:

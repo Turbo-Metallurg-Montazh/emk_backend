@@ -42,8 +42,8 @@ public class AdminUsersApiDelegateImpl implements AdminUsersApiDelegate {
     }
 
     @Override
-    public ResponseEntity<MessageResponse> resetUserPassword(String username) {
-        return new ResponseEntity<>(adminUserManagementService.resetUserPassword(username), HttpStatus.OK);
+    public ResponseEntity<MessageResponse> resetUserPassword(String email) {
+        return new ResponseEntity<>(adminUserManagementService.resetUserPassword(email), HttpStatus.OK);
     }
 
     @Override
