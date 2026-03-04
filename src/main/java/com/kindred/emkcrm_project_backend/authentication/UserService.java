@@ -3,6 +3,7 @@ package com.kindred.emkcrm_project_backend.authentication;
 import com.kindred.emkcrm_project_backend.authentication.rbac.RbacService;
 import com.kindred.emkcrm_project_backend.db.entities.User;
 import com.kindred.emkcrm_project_backend.db.repositories.UserRepository;
+import com.kindred.emkcrm_project_backend.exception.AccountDisabledException;
 import com.kindred.emkcrm_project_backend.exception.UnauthorizedException;
 import com.kindred.emkcrm_project_backend.model.LoginRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +33,7 @@ public class UserService {
         User user = findUserWithRolesByCredentials(loginInfo.getUsername(), loginInfo.getEmail());
         if (user != null && passwordEncoder.matches(loginInfo.getPassword(), user.getPassword())) {
             if (!user.isEnabled()) {
-                throw new UnauthorizedException("User account is disabled");
+                throw new AccountDisabledException("User account is disabled");
             }
             return user;
         }

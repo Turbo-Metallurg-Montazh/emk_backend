@@ -36,6 +36,15 @@ login:
               allOf:
                 - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
 
+      '423':
+        description: User account is disabled
+        content:
+          application/json:
+            schema:
+              title: Login423Response
+              allOf:
+                - $ref: "../../models/auth.yaml#/components/schemas/ErrorResponse"
+
       '501':
         description: Not implemented
         content:
